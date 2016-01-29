@@ -1,7 +1,7 @@
 {
   "name": "react-timeline",
   "version": "0.0.0",
-  "description": "A simple react timeline component form showing and filtering data...",
+  "description": "A simple react timeline component for showing and filtering data...",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
