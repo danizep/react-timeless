@@ -52,10 +52,11 @@ body {
 }
 
 .time-cursor {
+    position: absolute;
+    top: 0;
     width: 100px;
-    padding: 16px 10px 15px 10px;
+    padding: 16px 0 15px 0;
     background-color: #2895D4;
-    float: left;
     border-radius: inherit;
     text-align: center;
     cursor: ew-resize;
@@ -64,8 +65,4 @@ body {
     -moz-user-select: none;
     -webkit-user-select: none;
     -ms-user-select: none;
-}
-
-.time-cursor--max {
-    margin-left: 100px;
 }

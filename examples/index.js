@@ -24,6 +24,7 @@ const dates = [
 ];
 
 ReactDOM.render(
-    <Timeline dates={dates} />,
+    <Timeline dates={dates} onChange={(data) => console.info(data)} />,
     document.getElementById('example')
 );
+
