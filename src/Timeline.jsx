@@ -6,8 +6,8 @@ const Timeline = React.createClass({
         return {
             minCursorX: 0,
             maxCursorX: 0,
-            minCursorDate: this.props.minTime,
-            maxCursorDate: this.props.minTime
+            minCursorDate: 0,
+            maxCursorDate: 0
         }
     },
 
@@ -16,8 +16,7 @@ const Timeline = React.createClass({
             dates: {},
             onChange: null,
             onChangeDelay: 250,
-            minTime: 1996,
-            maxTime: 2015
+            cursorSize: 100
         }
     },
 
@@ -35,8 +34,6 @@ const Timeline = React.createClass({
     },
 
     render() {
-        const {minTime, maxTime} = this.state;
-
         const minCursorStyle = {
             transform: `translateX(${this.state.minCursorX}px)`
         };
@@ -45,24 +42,28 @@ const Timeline = React.createClass({
             transform: `translateX(${this.state.maxCursorX}px)`
         };
 
+        const timeRangeStyle = {
+            transform: `translateX(${this.state.minCursorX}px)`,
+            width: this.state.maxCursorX - this.state.minCursorX + this.props.cursorSize
+        };
+
         return (
             <div className="timeline-wrapper" ref={(ref) => this.timelineWrapper = ref}>
                 <div className="timeline-available">
-                    {this._getAvailableYearsHtml(this.props.minTime, this.props.maxTime)}
+                    {this._getAvailableYearsHtml(this.state.minTime, this.state.maxTime)}
                 </div>
-                <div className="timeline-range">
-                    <div className="time-cursor time-cursor--min"
-                         ref={(ref) => this.minCursor = ref}
-                         style={minCursorStyle}
-                         onMouseDown={this._handleMouseDown.bind(this, 'min')}
-                        >{this.state.minCursorDate}
-                    </div>
-                    <div className="time-cursor time-cursor--max"
-                         ref={(ref) => this.maxCursor = ref}
-                         style={maxCursorStyle}
-                         onMouseDown={this._handleMouseDown.bind(this, 'max')}
-                        >{this.state.maxCursorDate}</div>
+                <div className="timeline-range" style={timeRangeStyle}></div>
+                <div className="time-cursor time-cursor--min"
+                     ref={(ref) => this.minCursor = ref}
+                     style={minCursorStyle}
+                     onMouseDown={this._handleMouseDown.bind(this, 'min')}
+                    >{this.state.minCursorDate}
                 </div>
+                <div className="time-cursor time-cursor--max"
+                     ref={(ref) => this.maxCursor = ref}
+                     style={maxCursorStyle}
+                     onMouseDown={this._handleMouseDown.bind(this, 'max')}
+                    >{this.state.maxCursorDate}</div>
             </div>
         );
     },
@@ -74,7 +75,8 @@ const Timeline = React.createClass({
         const cursorSize = 100;
         let translateValue = event.clientX - (this.maxCursor.offsetLeft);
 
-        if ( translateValue > this.state.wrapperSize - cursorSize ) translateValue = this.state.wrapperSize - cursorSize;
+        if ( index === 'max' && translateValue > this.state.wrapperSize - cursorSize ) translateValue = this.state.wrapperSize - cursorSize;
+        if ( index === 'min' && translateValue < 0 ) translateValue = 0;
 
         state[`${index}CursorX`] = translateValue;
 
@@ -86,8 +88,7 @@ const Timeline = React.createClass({
 
     _handleChange() {
         if (this.props.onChange !== null && typeof this.props.onChange === 'function') {
-            
-            this.props.onChange()
+            this.props.onChange(this.state)
         }
     },
 
@@ -105,18 +106,31 @@ const Timeline = React.createClass({
                 if(date.time > maxTime) maxTime = date.time;
             }
 
-            this.setState({minTime, maxTime})
+            minTime = new Date(minTime*1000).getFullYear();
+            maxTime = new Date(maxTime*1000).getFullYear();
+
+            this.setState(
+                {
+                    minTime,
+                    maxTime,
+                    minCursorDate: minTime,
+                    maxCursorDate: maxTime
+                }
+            )
         }
     },
 
     _getAvailableYearsHtml(min, max) {
         let html = [];
 
-        min--;
-        max++;
+        if ( typeof this.state.timeScale === 'undefined' ) return null;
+
+        const style = {
+            width: this.state.timeScale + 'px'
+        };
 
         for(min; min <= max; min++) {
-            html.push(<div className="time-block" key={`year-${min}`} >{min}</div>)
+            html.push(<div className="time-block" style={style} key={`year-${min}`} >{min}</div>)
         }
 
         return html;
@@ -152,11 +166,9 @@ const Timeline = React.createClass({
     },
 
     _setWindowVars() {
-        const time = this.props.maxTime - this.props.minTime;
+        const time = this.state.maxTime - this.state.minTime;
         const wrapperSize = this.timelineWrapper.offsetWidth;
         const timeScale = wrapperSize / time;
-
-        console.log(wrapperSize);
 
         this.setState(
             {
@@ -167,17 +179,31 @@ const Timeline = React.createClass({
     },
 
     _updateValue() {
-        const minCursorDate = this.props.minTime + parseInt(this.state.minCursorX / this.state.timeScale);
-        const maxCursorDate = this.props.minTime + parseInt(this.state.maxCursorX / this.state.timeScale);
+        const minCursorDate = this.state.minTime + parseInt(this.state.minCursorX / this.state.timeScale);
+        const maxCursorDate = this.state.minTime + parseInt(this.state.maxCursorX / this.state.timeScale);
+        const minCursorTimestamp = this._getFirstDayTimestamp(minCursorDate);
+        const maxCursorTimestamp = this._getLastDayTimestamp(maxCursorDate);
 
         this.setState(
             {   minCursorDate,
-                maxCursorDate
+                maxCursorDate,
+                minCursorTimestamp,
+                maxCursorTimestamp
             },
             () => {
                 this._handleChange()
             }
         );
+    },
+
+    _getFirstDayTimestamp(year) {
+        const date = new Date(year, 1, 1, 0, 0, 0, 0);
+        return date.getTime() / 1000;
+    },
+
+    _getLastDayTimestamp(year) {
+        const date = new Date(year, 12, 31, 0, 0, 0, 0);
+        return date.getTime() / 1000;
     }
 });
 
