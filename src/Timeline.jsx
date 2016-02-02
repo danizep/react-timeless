@@ -16,7 +16,9 @@ const Timeline = React.createClass({
             dates: {},
             onChange: null,
             onChangeDelay: 250,
-            cursorSize: 75
+            cursorSize: 75,
+            cursorSnap: false,
+            timeRangeDrag: false
         }
     },
 
@@ -49,6 +51,11 @@ const Timeline = React.createClass({
             width: this.state.maxCursorX - this.state.minCursorX + this.props.cursorSize
         };
 
+        if (this.state.animate) {
+            console.log('animate');
+            minCursorStyle.transition = maxCursorStyle.transition = timeRangeStyle.transition = 'all 0.25s ease';
+        }
+
         return (
             <div className="timeline-wrapper" ref={(ref) => this.timelineWrapper = ref}>
                 <div className="timeline-available">
@@ -71,13 +78,11 @@ const Timeline = React.createClass({
     },
 
     _handdleDrag(event) {
-        let state = {
-            animate: false
-        };
+        let state = {};
 
         const index = this.state.activeCursor;
         const cursorSize = this.props.cursorSize;
-        let translateValue = event.clientX;
+        let translateValue = event.clientX - this.state.activeCursorOffsetClient;
 
         if ( index === 'max' ) {
             if ( translateValue > this.state.wrapperSize - cursorSize ) translateValue = this.state.wrapperSize - cursorSize;
@@ -152,10 +157,12 @@ const Timeline = React.createClass({
         window.removeEventListener('mousemove', this._handdleDrag, true);
     },
 
-    _handleMouseDown(cursor){
+    _handleMouseDown(cursor, event){
         this.setState(
             {
-                activeCursor: cursor
+                animate: false,
+                activeCursor: cursor,
+                activeCursorOffsetClient: event.clientX - this.state[`${cursor}CursorX`]
             }, () => {
                 window.addEventListener('mousemove', this._handdleDrag, true);
             }
@@ -207,6 +214,8 @@ const Timeline = React.createClass({
         );
     },
 
+    
+
     _getFirstDayTimestamp(year) {
         const date = new Date(year, 1, 1, 0, 0, 0, 0);
         return date.getTime() / 1000;
@@ -232,9 +241,9 @@ const Timeline = React.createClass({
 
         this.setState({
             animate: true,
-            activeCursor
+            activeCursor,
+            activeCursorOffsetClient: this.props.cursorSize / 2
         }, () => {
-            ;
             this._handdleDrag({clientX})
         })
     }

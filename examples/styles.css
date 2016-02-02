@@ -32,7 +32,7 @@ body {
 .timeline-available .time-block {
     width: 200px;
     float: left;
-    padding: 16px 0 0 0;
+    padding: 18px 0 0 0;
     user-select: none;
     -moz-user-select: none;
     -webkit-user-select: none;
