@@ -16,7 +16,7 @@ const Timeline = React.createClass({
             dates: {},
             onChange: null,
             onChangeDelay: 250,
-            cursorSize: 100
+            cursorSize: 75
         }
     },
 
@@ -35,11 +35,13 @@ const Timeline = React.createClass({
 
     render() {
         const minCursorStyle = {
-            transform: `translateX(${this.state.minCursorX}px)`
+            transform: `translateX(${this.state.minCursorX}px)`,
+            width: this.props.cursorSize
         };
 
         const maxCursorStyle = {
-            transform: `translateX(${this.state.maxCursorX}px)`
+            transform: `translateX(${this.state.maxCursorX}px)`,
+            width: this.props.cursorSize
         };
 
         const timeRangeStyle = {
@@ -72,11 +74,19 @@ const Timeline = React.createClass({
         let state = {};
 
         const index = this.state.activeCursor;
-        const cursorSize = 100;
+        const cursorSize = this.props.cursorSize;
         let translateValue = event.clientX - (this.maxCursor.offsetLeft);
 
-        if ( index === 'max' && translateValue > this.state.wrapperSize - cursorSize ) translateValue = this.state.wrapperSize - cursorSize;
-        if ( index === 'min' && translateValue < 0 ) translateValue = 0;
+
+        if ( index === 'max' ) {
+            if ( translateValue > this.state.wrapperSize - cursorSize ) translateValue = this.state.wrapperSize - cursorSize;
+            if ( translateValue < this.state.minCursorX + this.props.cursorSize ) translateValue = this.state.minCursorX + this.props.cursorSize;
+        }
+
+        if ( index === 'min' ) {
+            if ( translateValue < 0 ) translateValue = 0;
+            if ( translateValue > this.state.maxCursorX - this.props.cursorSize) translateValue = this.state.maxCursorX - this.props.cursorSize;
+        }
 
         state[`${index}CursorX`] = translateValue;
 
@@ -114,7 +124,7 @@ const Timeline = React.createClass({
                     minTime,
                     maxTime,
                     minCursorDate: minTime,
-                    maxCursorDate: maxTime
+                    maxCursorDate: minTime
                 }
             )
         }
@@ -204,6 +214,16 @@ const Timeline = React.createClass({
     _getLastDayTimestamp(year) {
         const date = new Date(year, 12, 31, 0, 0, 0, 0);
         return date.getTime() / 1000;
+    },
+
+    _trasitionTo(year) {
+        if( year < this.state.minCursorDate ) {
+            //send minCursor to position
+        }
+
+        if( year > this.state.maxCursorDate ) {
+            //send maxCursor to position
+        }
     }
 });
 

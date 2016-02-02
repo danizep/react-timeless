@@ -26,13 +26,14 @@ body {
 
 .timeline-available .time-block {
   width: 200px;
-  height: inherit;
   float: left;
-  padding: 15px 10px 15px 10px;
+  padding: 16px 0 0 0;
   user-select: none;
   -moz-user-select: none;
   -webkit-user-select: none;
-  -ms-user-select: none; }
+  -ms-user-select: none;
+  text-align: center;
+  font-size: smaller; }
 
 .timeline-range {
   height: inherit;
@@ -57,6 +58,7 @@ body {
   user-select: none;
   -moz-user-select: none;
   -webkit-user-select: none;
-  -ms-user-select: none; }
+  -ms-user-select: none;
+  font-weight: 300; }
 
 /*# sourceMappingURL=styles.css.map */
