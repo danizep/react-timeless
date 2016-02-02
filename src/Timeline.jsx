@@ -71,12 +71,13 @@ const Timeline = React.createClass({
     },
 
     _handdleDrag(event) {
-        let state = {};
+        let state = {
+            animate: false
+        };
 
         const index = this.state.activeCursor;
         const cursorSize = this.props.cursorSize;
-        let translateValue = event.clientX - (this.maxCursor.offsetLeft);
-
+        let translateValue = event.clientX;
 
         if ( index === 'max' ) {
             if ( translateValue > this.state.wrapperSize - cursorSize ) translateValue = this.state.wrapperSize - cursorSize;
@@ -140,7 +141,7 @@ const Timeline = React.createClass({
         };
 
         for(min; min <= max; min++) {
-            html.push(<div className="time-block" style={style} key={`year-${min}`} >{min}</div>)
+            html.push(<div className="time-block" style={style} key={`year-${min}`} onClick={this._transitionTo.bind(this, min)} >{min}</div>)
         }
 
         return html;
@@ -216,14 +217,26 @@ const Timeline = React.createClass({
         return date.getTime() / 1000;
     },
 
-    _trasitionTo(year) {
+    _transitionTo(year, event) {
+        let activeCursor;
+
         if( year < this.state.minCursorDate ) {
-            //send minCursor to position
+            activeCursor =  'min'
         }
 
         if( year > this.state.maxCursorDate ) {
-            //send maxCursor to position
+            activeCursor =  'max'
         }
+
+        let clientX = event.clientX;
+
+        this.setState({
+            animate: true,
+            activeCursor
+        }, () => {
+            ;
+            this._handdleDrag({clientX})
+        })
     }
 });
 
