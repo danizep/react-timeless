@@ -1,5 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
+import FastClick from 'fastclick';
 
 const Timeline = React.createClass({
     getInitialState() {
@@ -32,6 +33,7 @@ const Timeline = React.createClass({
     },
 
     componentDidMount() {
+        this._setFastClick();
         this._setWindowVars();
     },
 
@@ -52,7 +54,6 @@ const Timeline = React.createClass({
         };
 
         if (this.state.animate) {
-            console.log('animate');
             minCursorStyle.transition = maxCursorStyle.transition = timeRangeStyle.transition = 'all 0.25s ease';
         }
 
@@ -66,12 +67,14 @@ const Timeline = React.createClass({
                      ref={(ref) => this.minCursor = ref}
                      style={minCursorStyle}
                      onMouseDown={this._handleMouseDown.bind(this, 'min')}
+                     onTouchStart={this._handleMouseDown.bind(this, 'min')}
                     >{this.state.minCursorDate}
                 </div>
                 <div className="time-cursor time-cursor--max"
                      ref={(ref) => this.maxCursor = ref}
                      style={maxCursorStyle}
                      onMouseDown={this._handleMouseDown.bind(this, 'max')}
+                     onTouchStart={this._handleMouseDown.bind(this, 'max')}
                     >{this.state.maxCursorDate}</div>
             </div>
         );
@@ -99,7 +102,6 @@ const Timeline = React.createClass({
         this.setState(state, () => {
             this._updateValue();
         });
-
     },
 
     _handleChange() {
@@ -229,11 +231,11 @@ const Timeline = React.createClass({
     _transitionTo(year, event) {
         let activeCursor;
 
-        if( year < this.state.minCursorDate ) {
+        if ( year < this.state.minCursorDate ) {
             activeCursor =  'min'
         }
 
-        if( year > this.state.maxCursorDate ) {
+        if ( year > this.state.maxCursorDate ) {
             activeCursor =  'max'
         }
 
@@ -246,6 +248,10 @@ const Timeline = React.createClass({
         }, () => {
             this._handdleDrag({clientX})
         })
+    },
+
+    _setFastClick() {
+        FastClick.attach(document.body);
     }
 });
 
