@@ -1,2 +1,2 @@
 # react-timeline
-A simple react timeline component for showing and filtering data..
+A simple react timeline component for filtering data..
