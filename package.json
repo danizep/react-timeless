@@ -1,5 +1,5 @@
 {
-  "name": "react-timeline",
+  "name": "react-timeless",
   "version": "0.0.0",
   "description": "A simple react timeline component for showing and filtering data...",
   "main": "index.js",
@@ -11,7 +11,7 @@
     "timeline"
   ],
   "author": "danizep",
-  "license": "ISC",
+  "license": "MIT",
   "peerDependencies": {
     "react": "^0.14.0",
     "react-dom": "^0.14.0"
