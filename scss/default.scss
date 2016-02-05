@@ -1,9 +1,5 @@
-/* basic styles */
-body {
-  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-  color: white; }
-
 /* timeline styles */
+
 .timeline-wrapper {
   margin-top: 100px;
   width: 100%;
@@ -16,13 +12,15 @@ body {
   user-select: none;
   -moz-user-select: none;
   -webkit-user-select: none;
-  -ms-user-select: none; }
+  -ms-user-select: none;
+}
 
 .timeline-available {
   height: inherit;
   display: inline-flex;
   position: absolute;
-  user-select: none; }
+  user-select: none;
+}
 
 .timeline-available .time-block {
   width: 200px;
@@ -33,7 +31,8 @@ body {
   -webkit-user-select: none;
   -ms-user-select: none;
   text-align: center;
-  font-size: smaller; }
+  font-size: smaller;
+}
 
 .timeline-range {
   height: inherit;
@@ -43,9 +42,11 @@ body {
   user-select: none;
   -moz-user-select: none;
   -webkit-user-select: none;
-  -ms-user-select: none; }
+  -ms-user-select: none;
+}
 
 .time-cursor {
+  color: white;
   position: absolute;
   top: 0;
   width: 100px;
@@ -59,6 +60,5 @@ body {
   -moz-user-select: none;
   -webkit-user-select: none;
   -ms-user-select: none;
-  font-weight: 300; }
-
-/*# sourceMappingURL=styles.css.map */
+  font-weight: 300;
+}
