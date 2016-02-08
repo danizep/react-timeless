@@ -1,6 +1,5 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import FastClick from 'fastclick';
 
 const Timeline = React.createClass({
     getInitialState() {
@@ -17,7 +16,7 @@ const Timeline = React.createClass({
             dates: {},
             onChange: null,
             onChangeDelay: 250,
-            cursorSize: 75,
+            cursorWidth: 75,
             cursorSnap: false,
             timeRangeDrag: false
         }
@@ -33,24 +32,23 @@ const Timeline = React.createClass({
     },
 
     componentDidMount() {
-        this._setFastClick();
         this._setWindowVars();
     },
 
     render() {
         const minCursorStyle = {
             transform: `translateX(${this.state.minCursorX}px)`,
-            width: this.props.cursorSize
+            width: this.props.cursorWidth
         };
 
         const maxCursorStyle = {
             transform: `translateX(${this.state.maxCursorX}px)`,
-            width: this.props.cursorSize
+            width: this.props.cursorWidth
         };
 
         const timeRangeStyle = {
             transform: `translateX(${this.state.minCursorX}px)`,
-            width: this.state.maxCursorX - this.state.minCursorX + this.props.cursorSize
+            width: (this.state.maxCursorX - this.state.minCursorX) + this.props.cursorWidth
         };
 
         if (this.state.animate) {
@@ -84,17 +82,17 @@ const Timeline = React.createClass({
         let state = {};
 
         const index = this.state.activeCursor;
-        const cursorSize = this.props.cursorSize;
+        const cursorWidth = this.props.cursorWidth;
         let translateValue = event.clientX - this.state.activeCursorOffsetClient;
 
         if ( index === 'max' ) {
-            if ( translateValue > this.state.wrapperSize - cursorSize ) translateValue = this.state.wrapperSize - cursorSize;
-            if ( translateValue < this.state.minCursorX + this.props.cursorSize ) translateValue = this.state.minCursorX + this.props.cursorSize;
+            if ( translateValue > this.state.wrapperSize - cursorWidth ) translateValue = this.state.wrapperSize - cursorWidth;
+            if ( translateValue < this.state.minCursorX + cursorWidth ) translateValue = this.state.minCursorX + cursorWidth;
         }
 
         if ( index === 'min' ) {
             if ( translateValue < 0 ) translateValue = 0;
-            if ( translateValue > this.state.maxCursorX - this.props.cursorSize) translateValue = this.state.maxCursorX - this.props.cursorSize;
+            if ( translateValue > this.state.maxCursorX - cursorWidth) translateValue = this.state.maxCursorX - cursorWidth;
         }
 
         state[`${index}CursorX`] = translateValue;
@@ -148,7 +146,16 @@ const Timeline = React.createClass({
         };
 
         for(min; min <= max; min++) {
-            html.push(<div className="time-block" style={style} key={`year-${min}`} onClick={this._transitionTo.bind(this, min)} >{min}</div>)
+            let className = "time-block--year";
+
+            if (min > this.state.minCursorDate && min < this.state.maxCursorDate) className += " time-block--in-range";
+            if (min === this.state.minCursorDate || min === this.state.maxCursorDate) className += " time-block--active";
+
+            html.push(
+                (<div className="time-block" style={style} key={`year-${min}`} onClick={this._transitionTo.bind(this, min)} >
+                    <span className={className}>{min}</span>
+                </div>)
+            )
         }
 
         return html;
@@ -188,19 +195,24 @@ const Timeline = React.createClass({
     _setWindowVars() {
         const time = this.state.maxTime - this.state.minTime;
         const wrapperSize = this.timelineWrapper.offsetWidth;
-        const timeScale = wrapperSize / time;
+        const wrapperOffsetLeft = this.timelineWrapper.offsetLeft;
+        let timeScale = wrapperSize / time;
+
+        if (timeScale < this.props.cursorWidth) timeScale = this.props.cursorWidth;
 
         this.setState(
             {
                 wrapperSize,
+                wrapperOffsetLeft,
                 timeScale
             }
         )
     },
 
     _updateValue() {
-        const minCursorDate = this.state.minTime + parseInt(this.state.minCursorX / this.state.timeScale);
-        const maxCursorDate = this.state.minTime + parseInt(this.state.maxCursorX / this.state.timeScale);
+        const halfCursorWith = this.props.cursorWidth / 2;
+        const minCursorDate = this.state.minTime + parseInt((this.state.minCursorX + halfCursorWith) / this.state.timeScale);
+        const maxCursorDate = this.state.minTime + parseInt((this.state.maxCursorX + halfCursorWith) / this.state.timeScale);
         const minCursorTimestamp = this._getFirstDayTimestamp(minCursorDate);
         const maxCursorTimestamp = this._getLastDayTimestamp(maxCursorDate);
 
@@ -239,19 +251,15 @@ const Timeline = React.createClass({
             activeCursor =  'max'
         }
 
-        let clientX = event.clientX;
+        let clientX = event.clientX - this.state.wrapperOffsetLeft;
 
         this.setState({
             animate: true,
             activeCursor,
-            activeCursorOffsetClient: this.props.cursorSize / 2
+            activeCursorOffsetClient: this.props.cursorWidth / 2
         }, () => {
             this._handdleDrag({clientX})
         })
-    },
-
-    _setFastClick() {
-        FastClick.attach(document.body);
     }
 });
 
