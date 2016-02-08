@@ -46,7 +46,6 @@ h1, p {
     -ms-user-select: none;
     text-align: center;
     font-size: smaller;
-    cursor: pointer;
 }
 
 .timeline-range {
@@ -63,12 +62,17 @@ h1, p {
     overflow: hidden;
 }
 
+.time-block--year {
+    transition: opacity 500ms ease, color 500ms ease;
+    cursor: pointer;
+}
+
 .time-block--in-range {
     color: white;
 }
 
 .time-block--active {
-    visibility: hidden;
+    opacity: 0;
 }
 
 .time-cursor {
