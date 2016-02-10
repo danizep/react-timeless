@@ -1,5 +1,6 @@
 /* timeline styles */
 
+
 .timeline-wrapper {
   line-height: 1;
   margin-top: 100px;
@@ -34,7 +35,6 @@
   -ms-user-select: none;
   text-align: center;
   font-size: smaller;
-  cursor: pointer;
 }
 
 .timeline-range {
@@ -51,12 +51,17 @@
   overflow: hidden;
 }
 
+.time-block--year {
+  transition: opacity 500ms ease, color 500ms ease;
+  cursor: pointer;
+}
+
 .time-block--in-range {
   color: white;
 }
 
 .time-block--active {
-  visibility: hidden;
+  opacity: 0;
 }
 
 .time-cursor {
@@ -77,4 +82,11 @@
   font-weight: 300;
   box-sizing: border-box;
   z-index: 2;
+}
+
+.timeline-animate {
+  -webkit-transition: all 250ms ease;
+  -moz-transition: all 250ms ease;
+  -o-transition: all 250ms ease;
+  transition: all 250ms ease;
 }

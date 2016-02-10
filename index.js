@@ -1,3 +1,3 @@
 'use strict';
 
-module.exports = require('./lib/Timeline');
+module.exports = require('./dist/Timeline');

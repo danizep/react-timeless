@@ -4,7 +4,8 @@
   "description": "A simple react timeline component for filtering data...",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "babel src/Timeline.jsx --out-file dist/Timeline.js"
   },
   "repository": {
     "type": "git",
