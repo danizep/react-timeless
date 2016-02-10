@@ -61,22 +61,30 @@
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 	var dates = [{
-	    time: 601257600,
-	    label: 'things happened'
+	    start: 601257600,
+	    end: 601257600
 	}, {
-	    time: 957139200,
-	    label: 'succeeded events'
+	    start: 957139200,
+	    end: 957139200
 	}, {
-	    time: 601257600,
-	    label: 'things took place'
+	    start: 601257600,
+	    end: 601257600
 	}, {
-	    time: 1217980800,
-	    label: 'yet another change of events'
+	    start: 1217980800,
+	    end: 1217980800
 	}];
 
 	_reactDom2.default.render(_react2.default.createElement(_Timeline2.default, { dates: dates, onChange: function onChange(data) {
-	        return console.info(data);
+	        return appendInfo(data);
 	    } }), document.getElementById('example'));
+
+	function appendInfo(data) {
+	    console.info(data);
+	    document.getElementById('minT').innerHTML = data.minCursorTimestamp;
+	    document.getElementById('maxT').innerHTML = data.maxCursorTimestamp;
+	    document.getElementById('minY').innerHTML = data.minCursorDate;
+	    document.getElementById('maxY').innerHTML = data.maxCursorDate;
+	}
 
 /***/ },
 /* 1 */
@@ -132,22 +140,29 @@
 	        var _this = this;
 
 	        var minCursorStyle = {
-	            transform: 'translateX(' + this.state.minCursorX + 'px)',
+	            transform: 'translate3d(' + this.state.minCursorX + 'px,0,0)',
 	            width: this.props.cursorWidth
 	        };
 
 	        var maxCursorStyle = {
-	            transform: 'translateX(' + this.state.maxCursorX + 'px)',
+	            transform: 'translate3d(' + this.state.maxCursorX + 'px,0,0)',
 	            width: this.props.cursorWidth
 	        };
 
 	        var timeRangeStyle = {
-	            transform: 'translateX(' + this.state.minCursorX + 'px)',
+	            transform: 'translate3d(' + this.state.minCursorX + 'px,0,0)',
 	            width: this.state.maxCursorX - this.state.minCursorX + this.props.cursorWidth
 	        };
 
+	        var minCursorClass = 'time-cursor time-cursor--min';
+	        var maxCursorClass = 'time-cursor time-cursor--max';
+	        var timeRangeClass = 'timeline-range';
+
 	        if (this.state.animate) {
-	            minCursorStyle.transition = maxCursorStyle.transition = timeRangeStyle.transition = 'all 0.25s ease';
+	            //minCursorStyle.transition = maxCursorStyle.transition = timeRangeStyle.transition = 'all 0.25s ease';
+	            minCursorClass += ' timeline-animate';
+	            maxCursorClass += ' timeline-animate';
+	            timeRangeClass += ' timeline-animate';
 	        }
 
 	        return _react2.default.createElement(
@@ -160,10 +175,10 @@
 	                { className: 'timeline-available' },
 	                this._getAvailableYearsHtml(this.state.minTime, this.state.maxTime)
 	            ),
-	            _react2.default.createElement('div', { className: 'timeline-range', style: timeRangeStyle }),
+	            _react2.default.createElement('div', { className: timeRangeClass, style: timeRangeStyle }),
 	            _react2.default.createElement(
 	                'div',
-	                { className: 'time-cursor time-cursor--min',
+	                { className: minCursorClass,
 	                    ref: function ref(_ref) {
 	                        return _this.minCursor = _ref;
 	                    },
@@ -175,7 +190,7 @@
 	            ),
 	            _react2.default.createElement(
 	                'div',
-	                { className: 'time-cursor time-cursor--max',
+	                { className: maxCursorClass,
 	                    ref: function ref(_ref2) {
 	                        return _this.maxCursor = _ref2;
 	                    },
@@ -187,7 +202,7 @@
 	            )
 	        );
 	    },
-	    _handdleDrag: function _handdleDrag(event) {
+	    _handleDrag: function _handleDrag(event) {
 	        var _this2 = this;
 
 	        var state = {};
@@ -223,8 +238,8 @@
 	        var maxTime = undefined;
 
 	        if (dates) {
-	            minTime = dates[0].time;
-	            maxTime = dates[0].time;
+	            minTime = dates[0].start;
+	            maxTime = dates[0].start;
 
 	            var _iteratorNormalCompletion = true;
 	            var _didIteratorError = false;
@@ -234,8 +249,8 @@
 	                for (var _iterator = dates[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
 	                    var date = _step.value;
 
-	                    if (date.time < minTime) minTime = date.time;
-	                    if (date.time > maxTime) maxTime = date.time;
+	                    if (date.start < minTime) minTime = date.start;
+	                    if (date.start > maxTime) maxTime = date.start;
 	                }
 	            } catch (err) {
 	                _didIteratorError = true;
@@ -292,7 +307,7 @@
 	        return html;
 	    },
 	    _handleMouseUp: function _handleMouseUp() {
-	        window.removeEventListener('mousemove', this._handdleDrag, true);
+	        window.removeEventListener('mousemove', this._handleDrag, true);
 	    },
 	    _handleMouseDown: function _handleMouseDown(cursor, event) {
 	        var _this3 = this;
@@ -302,7 +317,7 @@
 	            activeCursor: cursor,
 	            activeCursorOffsetClient: event.clientX - this.state[cursor + 'CursorX']
 	        }, function () {
-	            window.addEventListener('mousemove', _this3._handdleDrag, true);
+	            window.addEventListener('mousemove', _this3._handleDrag, true);
 	        });
 	    },
 	    _handleResize: function _handleResize() {
@@ -317,21 +332,42 @@
 	        window.removeEventListener('resize', this._handleResize, false);
 	    },
 	    _setWindowVars: function _setWindowVars() {
+	        var _this4 = this;
+
 	        var time = this.state.maxTime - this.state.minTime;
 	        var wrapperSize = this.timelineWrapper.offsetWidth;
 	        var wrapperOffsetLeft = this.timelineWrapper.offsetLeft;
+
+	        var _state = this.state;
+	        var minCursorX = _state.minCursorX;
+	        var maxCursorX = _state.maxCursorX;
+
 	        var timeScale = wrapperSize / time;
 
-	        if (timeScale < this.props.cursorWidth) timeScale = this.props.cursorWidth;
+	        if (timeScale < this.props.cursorWidth) {
+	            timeScale = this.props.cursorWidth;
+	        }
+
+	        if (this.state.timeScale) {
+	            minCursorX = this._getRepositionCursorX('min', timeScale);
+	            maxCursorX = this._getRepositionCursorX('max', timeScale);
+	        } else {
+	            minCursorX = wrapperSize / 4 + this.props.cursorWidth / 4;
+	            maxCursorX = wrapperSize / 4 * 3 - this.props.cursorWidth / 4;
+	        }
 
 	        this.setState({
 	            wrapperSize: wrapperSize,
 	            wrapperOffsetLeft: wrapperOffsetLeft,
-	            timeScale: timeScale
+	            timeScale: timeScale,
+	            minCursorX: minCursorX,
+	            maxCursorX: maxCursorX
+	        }, function () {
+	            _this4._updateValue();
 	        });
 	    },
 	    _updateValue: function _updateValue() {
-	        var _this4 = this;
+	        var _this5 = this;
 
 	        var halfCursorWith = this.props.cursorWidth / 2;
 	        var minCursorDate = this.state.minTime + parseInt((this.state.minCursorX + halfCursorWith) / this.state.timeScale);
@@ -344,30 +380,23 @@
 	            minCursorTimestamp: minCursorTimestamp,
 	            maxCursorTimestamp: maxCursorTimestamp
 	        }, function () {
-	            _this4._handleChange();
+	            _this5._handleChange();
 	        });
 	    },
 	    _getFirstDayTimestamp: function _getFirstDayTimestamp(year) {
-	        var date = new Date(year, 1, 1, 0, 0, 0, 0);
+	        var date = new Date(year, 0, 1, 0, 0, 0, 0);
 	        return date.getTime() / 1000;
 	    },
 	    _getLastDayTimestamp: function _getLastDayTimestamp(year) {
-	        var date = new Date(year, 12, 31, 0, 0, 0, 0);
+	        var date = new Date(year, 11, 31, 0, 0, 0, 0);
 	        return date.getTime() / 1000;
 	    },
 	    _transitionTo: function _transitionTo(year, event) {
-	        var _this5 = this;
+	        var _this6 = this;
 
-	        var activeCursor = undefined;
-
-	        if (year < this.state.minCursorDate) {
-	            activeCursor = 'min';
-	        }
-
-	        if (year > this.state.maxCursorDate) {
-	            activeCursor = 'max';
-	        }
-
+	        var minCursorDiff = Math.abs(year - this.state.minCursorDate);
+	        var maxCursorDiff = Math.abs(year - this.state.maxCursorDate);
+	        var activeCursor = minCursorDiff < maxCursorDiff ? 'min' : 'max';
 	        var clientX = event.clientX - this.state.wrapperOffsetLeft;
 
 	        this.setState({
@@ -375,8 +404,11 @@
 	            activeCursor: activeCursor,
 	            activeCursorOffsetClient: this.props.cursorWidth / 2
 	        }, function () {
-	            _this5._handdleDrag({ clientX: clientX });
+	            _this6._handleDrag({ clientX: clientX });
 	        });
+	    },
+	    _getRepositionCursorX: function _getRepositionCursorX(cursor, newTimescale) {
+	        return this.state[cursor + 'CursorX'] * newTimescale / this.state.timeScale;
 	    }
 	});
 

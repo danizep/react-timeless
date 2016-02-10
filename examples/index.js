@@ -5,26 +5,34 @@ import Timeline from '../src/Timeline';
 
 const dates = [
     {
-        time: 601257600,
-        label: 'things happened'
+        start: 601257600,
+        end: 601257600
     },
     {
-        time: 957139200,
-        label: 'succeeded events'
+        start: 957139200,
+        end: 957139200
     },
     {
-        time: 601257600,
-        label: 'things took place'
+        start: 601257600,
+        end: 601257600
     },
     {
-        time: 1217980800,
-        label: 'yet another change of events'
+        start: 1217980800,
+        end: 1217980800
     }
 
 ];
 
 ReactDOM.render(
-    <Timeline dates={dates} onChange={(data) => console.info(data)} />,
+    <Timeline dates={dates} onChange={(data) => appendInfo(data)} />,
     document.getElementById('example')
 );
+
+function appendInfo(data) {
+    console.info(data);
+    document.getElementById('minT').innerHTML = data.minCursorTimestamp;
+    document.getElementById('maxT').innerHTML = data.maxCursorTimestamp;
+    document.getElementById('minY').innerHTML = data.minCursorDate;
+    document.getElementById('maxY').innerHTML = data.maxCursorDate;
+}
 

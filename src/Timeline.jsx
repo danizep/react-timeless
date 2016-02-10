@@ -37,22 +37,29 @@ const Timeline = React.createClass({
 
     render() {
         const minCursorStyle = {
-            transform: `translateX(${this.state.minCursorX}px)`,
+            transform: `translate3d(${this.state.minCursorX}px,0,0)`,
             width: this.props.cursorWidth
         };
 
         const maxCursorStyle = {
-            transform: `translateX(${this.state.maxCursorX}px)`,
+            transform: `translate3d(${this.state.maxCursorX}px,0,0)`,
             width: this.props.cursorWidth
         };
 
         const timeRangeStyle = {
-            transform: `translateX(${this.state.minCursorX}px)`,
+            transform: `translate3d(${this.state.minCursorX}px,0,0)`,
             width: (this.state.maxCursorX - this.state.minCursorX) + this.props.cursorWidth
         };
 
+        let minCursorClass = 'time-cursor time-cursor--min';
+        let maxCursorClass = 'time-cursor time-cursor--max';
+        let timeRangeClass = 'timeline-range';
+
         if (this.state.animate) {
-            minCursorStyle.transition = maxCursorStyle.transition = timeRangeStyle.transition = 'all 0.25s ease';
+            //minCursorStyle.transition = maxCursorStyle.transition = timeRangeStyle.transition = 'all 0.25s ease';
+            minCursorClass += ' timeline-animate';
+            maxCursorClass += ' timeline-animate';
+            timeRangeClass += ' timeline-animate';
         }
 
         return (
@@ -60,15 +67,15 @@ const Timeline = React.createClass({
                 <div className="timeline-available">
                     {this._getAvailableYearsHtml(this.state.minTime, this.state.maxTime)}
                 </div>
-                <div className="timeline-range" style={timeRangeStyle}></div>
-                <div className="time-cursor time-cursor--min"
+                <div className={timeRangeClass} style={timeRangeStyle}></div>
+                <div className={minCursorClass}
                      ref={(ref) => this.minCursor = ref}
                      style={minCursorStyle}
                      onMouseDown={this._handleMouseDown.bind(this, 'min')}
                      onTouchStart={this._handleMouseDown.bind(this, 'min')}
                     >{this.state.minCursorDate}
                 </div>
-                <div className="time-cursor time-cursor--max"
+                <div className={maxCursorClass}
                      ref={(ref) => this.maxCursor = ref}
                      style={maxCursorStyle}
                      onMouseDown={this._handleMouseDown.bind(this, 'max')}
@@ -78,7 +85,7 @@ const Timeline = React.createClass({
         );
     },
 
-    _handdleDrag(event) {
+    _handleDrag(event) {
         let state = {};
 
         const index = this.state.activeCursor;
@@ -114,12 +121,12 @@ const Timeline = React.createClass({
         let maxTime;
 
         if(dates) {
-            minTime = dates[0].time;
-            maxTime = dates[0].time;
+            minTime = dates[0].start;
+            maxTime = dates[0].start;
 
             for(let date of dates) {
-                if(date.time < minTime) minTime = date.time;
-                if(date.time > maxTime) maxTime = date.time;
+                if(date.start < minTime) minTime = date.start;
+                if(date.start > maxTime) maxTime = date.start;
             }
 
             minTime = new Date(minTime*1000).getFullYear();
@@ -163,7 +170,7 @@ const Timeline = React.createClass({
 
     _handleMouseUp()
     {
-        window.removeEventListener('mousemove', this._handdleDrag, true);
+        window.removeEventListener('mousemove', this._handleDrag, true);
     },
 
     _handleMouseDown(cursor, event){
@@ -173,7 +180,7 @@ const Timeline = React.createClass({
                 activeCursor: cursor,
                 activeCursorOffsetClient: event.clientX - this.state[`${cursor}CursorX`]
             }, () => {
-                window.addEventListener('mousemove', this._handdleDrag, true);
+                window.addEventListener('mousemove', this._handleDrag, true);
             }
         )
     },
@@ -196,17 +203,32 @@ const Timeline = React.createClass({
         const time = this.state.maxTime - this.state.minTime;
         const wrapperSize = this.timelineWrapper.offsetWidth;
         const wrapperOffsetLeft = this.timelineWrapper.offsetLeft;
+
+        let {minCursorX, maxCursorX} =  this.state;
         let timeScale = wrapperSize / time;
 
-        if (timeScale < this.props.cursorWidth) timeScale = this.props.cursorWidth;
+        if (timeScale < this.props.cursorWidth) {
+            timeScale = this.props.cursorWidth;
+        }
+
+        if (this.state.timeScale) {
+            minCursorX = this._getRepositionCursorX('min', timeScale);
+            maxCursorX = this._getRepositionCursorX('max', timeScale);
+        } else {
+            minCursorX = ( wrapperSize / 4 ) + ( this.props.cursorWidth / 4 );
+            maxCursorX = ( wrapperSize / 4 ) * 3 - ( this.props.cursorWidth / 4 );
+        }
 
         this.setState(
             {
                 wrapperSize,
                 wrapperOffsetLeft,
-                timeScale
-            }
-        )
+                timeScale,
+                minCursorX,
+                maxCursorX
+            }, () => {
+            this._updateValue();
+        });
     },
 
     _updateValue() {
@@ -228,38 +250,33 @@ const Timeline = React.createClass({
         );
     },
 
-    
-
     _getFirstDayTimestamp(year) {
-        const date = new Date(year, 1, 1, 0, 0, 0, 0);
+        const date = new Date(year, 0, 1, 0, 0, 0, 0);
         return date.getTime() / 1000;
     },
 
     _getLastDayTimestamp(year) {
-        const date = new Date(year, 12, 31, 0, 0, 0, 0);
+        const date = new Date(year, 11, 31, 0, 0, 0, 0);
         return date.getTime() / 1000;
     },
 
     _transitionTo(year, event) {
-        let activeCursor;
-
-        if ( year < this.state.minCursorDate ) {
-            activeCursor =  'min'
-        }
-
-        if ( year > this.state.maxCursorDate ) {
-            activeCursor =  'max'
-        }
-
-        let clientX = event.clientX - this.state.wrapperOffsetLeft;
+        const minCursorDiff = Math.abs(year - this.state.minCursorDate);
+        const maxCursorDiff = Math.abs(year - this.state.maxCursorDate);
+        const activeCursor = minCursorDiff < maxCursorDiff ? 'min' : 'max';
+        const clientX = event.clientX - this.state.wrapperOffsetLeft;
 
         this.setState({
             animate: true,
             activeCursor,
             activeCursorOffsetClient: this.props.cursorWidth / 2
         }, () => {
-            this._handdleDrag({clientX})
+            this._handleDrag({clientX})
         })
+    },
+
+    _getRepositionCursorX(cursor, newTimescale) {
+        return (this.state[`${cursor}CursorX`] * newTimescale) / this.state.timeScale;
     }
 });
 

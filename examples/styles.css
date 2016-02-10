@@ -94,3 +94,10 @@ h1, p {
     box-sizing: border-box;
     z-index: 2;
 }
+
+.timeline-animate {
+    -webkit-transition: all 250ms ease;
+    -moz-transition: all 250ms ease;
+    -o-transition: all 250ms ease;
+    transition: all 250ms ease;
+}
