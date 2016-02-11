@@ -15,7 +15,9 @@ npm install react-timeless --save
 ## Usage
 
 React-Timeless is still a work in progress component, but basically it creates a simple timeline with a rage based on the provided dates.
+
 The timeline has two corsurs witch can be moved to define a selected range.
+
 Every time the rage changes `onChange(newData)` will run.
 
 ```javascript
