@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 
-import Timeline from '../src/Timeline';
+import Timeless from '../src/Timeline';
 
 const dates = [
     {
@@ -24,7 +24,7 @@ const dates = [
 ];
 
 ReactDOM.render(
-    <Timeline dates={dates} onChange={(data) => appendInfo(data)} />,
+    <Timeless dates={dates} onChange={appendInfo} />,
     document.getElementById('example')
 );
 

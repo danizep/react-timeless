@@ -74,9 +74,7 @@
 	    end: 1217980800
 	}];
 
-	_reactDom2.default.render(_react2.default.createElement(_Timeline2.default, { dates: dates, onChange: function onChange(data) {
-	        return appendInfo(data);
-	    } }), document.getElementById('example'));
+	_reactDom2.default.render(_react2.default.createElement(_Timeline2.default, { dates: dates, onChange: appendInfo }), document.getElementById('example'));
 
 	function appendInfo(data) {
 	    console.info(data);

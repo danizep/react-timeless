@@ -1,11 +1,11 @@
 {
   "name": "react-timeless",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "A simple react timeline component for filtering data...",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "babel src/Timeline.jsx --out-file dist/Timeline.js"
+    "build": "babel src/Timeless.jsx --out-file dist/Timeless.js"
   },
   "repository": {
     "type": "git",
@@ -21,11 +21,9 @@
     "react": "^0.14.0",
     "react-dom": "^0.14.0"
   },
-  "dependencies": {
-    "react": "^0.14.6",
-    "react-dom": "^0.14.6"
-  },
   "devDependencies": {
+    "react": "^0.14.6",
+    "react-dom": "^0.14.6",
     "babel-core": "^6.4.5",
     "babel-loader": "^6.2.1",
     "babel-preset-es2015": "^6.3.13",

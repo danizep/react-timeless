@@ -14,8 +14,8 @@ var _reactDom2 = _interopRequireDefault(_reactDom);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-var Timeline = _react2.default.createClass({
-    displayName: 'Timeline',
+var Timeless = _react2.default.createClass({
+    displayName: 'Timeless',
     getInitialState: function getInitialState() {
         return {
             minCursorX: 0,
@@ -320,4 +320,4 @@ var Timeline = _react2.default.createClass({
     }
 });
 
-exports.default = Timeline;
+exports.default = Timeless;

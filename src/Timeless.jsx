@@ -1,7 +1,8 @@
+'use strict';
 import React from 'react';
 import ReactDOM from 'react-dom';
 
-const Timeline = React.createClass({
+const Timeless = React.createClass({
     getInitialState() {
         return {
             minCursorX: 0,
@@ -280,5 +281,5 @@ const Timeline = React.createClass({
     }
 });
 
-export default Timeline;
+export default Timeless;
 
