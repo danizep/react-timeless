@@ -1,6 +1,6 @@
 {
   "name": "react-timeless",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "A simple react timeline component for filtering data...",
   "main": "index.js",
   "scripts": {
