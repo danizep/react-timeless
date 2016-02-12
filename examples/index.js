@@ -1,7 +1,9 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 
-import Timeless from '../src/Timeline';
+import Timeless from '../src/Timeless';
+
+require('../scss/default.scss');
 
 const dates = [
     {
