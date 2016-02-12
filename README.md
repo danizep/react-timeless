@@ -57,7 +57,8 @@ function logChange(data) {
 ```
 ## Preview
 
-Based on [Maricato's](https://www.behance.net/maricato) design.
+
+Based on the design of my dear colleague [Maricato](https://www.behance.net/maricato).
 
 ![Image of Timeless]
 (http://danizep.com/projects/react-timeless/examples/preview.png)
