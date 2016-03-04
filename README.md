@@ -55,13 +55,6 @@ function logChange(data) {
 	onChange={logChange}
 />
 ```
-## Preview
-
-
-Based on the design of my dear colleague [Maricato](https://www.behance.net/maricato).
-
-![Image of Timeless]
-(http://danizep.com/projects/react-timeless/examples/preview.png)
 
 ## Example
 

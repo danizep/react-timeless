@@ -19,7 +19,9 @@ const Timeless = React.createClass({
             onChangeDelay: 250,
             cursorWidth: 75,
             cursorSnap: false,
-            timeRangeDrag: false
+            timeRangeDrag: false,
+            cursorArrow: true
+
         }
     },
 
@@ -61,6 +63,11 @@ const Timeless = React.createClass({
             minCursorClass += ' timeline-animate';
             maxCursorClass += ' timeline-animate';
             timeRangeClass += ' timeline-animate';
+        }
+
+        if(this.props.cursorArrow) {
+            minCursorClass += ' cursor-arrow';
+            maxCursorClass += ' cursor-arrow';
         }
 
         return (
@@ -222,6 +229,7 @@ const Timeless = React.createClass({
 
         this.setState(
             {
+                animate: false,
                 wrapperSize,
                 wrapperOffsetLeft,
                 timeScale,

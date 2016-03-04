@@ -97,3 +97,29 @@ $timeline_cursor_font_color: #fff !default;
   -o-transition: all 250ms ease;
   transition: all 250ms ease;
 }
+
+.time-cursor--min {
+  &.cursor-arrow:before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 97%;
+    width: 0;
+    height: 0;
+    border: 25px solid transparent;
+    border-left: 12px solid $timeline_cursor_bg_color;
+  }
+}
+
+.time-cursor--max {
+  &.cursor-arrow:after {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 97%;
+    width: 0;
+    height: 0;
+    border: 25px solid transparent;
+    border-right: 12px solid $timeline_cursor_bg_color;
+  }
+}

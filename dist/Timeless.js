@@ -265,6 +265,7 @@ var Timeless = _react2.default.createClass({
         }
 
         this.setState({
+            animate: false,
             wrapperSize: wrapperSize,
             wrapperOffsetLeft: wrapperOffsetLeft,
             timeScale: timeScale,
