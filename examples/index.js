@@ -5,28 +5,12 @@ import Timeless from '../src/Timeless';
 
 require('../scss/default.scss');
 
-const dates = [
-    {
-        start: 601257600,
-        end: 601257600
-    },
-    {
-        start: 957139200,
-        end: 957139200
-    },
-    {
-        start: 601257600,
-        end: 601257600
-    },
-    {
-        start: 1217980800,
-        end: 1217980800
-    }
-
-];
-
 ReactDOM.render(
-    <Timeless dates={dates} onChange={appendInfo} />,
+    <Timeless minTimestamp={601257600}
+              maxTimestamp={1217980800}
+              minCursorDefaultTimestamp={601257600}
+              maxCursorDefaultTimestamp={917980800}
+              onChange={appendInfo} />,
     document.getElementById('example')
 );
 

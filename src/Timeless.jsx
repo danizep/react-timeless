@@ -20,8 +20,12 @@ const Timeless = React.createClass({
             cursorWidth: 75,
             cursorSnap: false,
             timeRangeDrag: false,
-            cursorArrow: true
-
+            cursorArrow: true,
+            disabled: false,
+            minTimestamp: 0,
+            maxTimestamp: 0,
+            minCursorDefaultTimestamp: 0,
+            maxCursorDefaultTimestamp: 0
         }
     },
 
@@ -125,30 +129,37 @@ const Timeless = React.createClass({
 
     _getMinMaxDates() {
         const dates = this.props.dates;
+        const {minTimestamp, maxTimestamp} = this.props;
+
         let minTime;
         let maxTime;
 
-        if(dates) {
-            minTime = dates[0].start;
-            maxTime = dates[0].start;
+        if ( minTimestamp && maxTimestamp && minTimestamp !== maxTimestamp ) {
+            minTime = minTimestamp;
+            maxTime = maxTimestamp;
+        } else {
+            if(dates) {
+                minTime = dates[0].start;
+                maxTime = dates[0].start;
 
-            for(let date of dates) {
-                if(date.start < minTime) minTime = date.start;
-                if(date.start > maxTime) maxTime = date.start;
-            }
-
-            minTime = new Date(minTime*1000).getFullYear();
-            maxTime = new Date(maxTime*1000).getFullYear();
-
-            this.setState(
-                {
-                    minTime,
-                    maxTime,
-                    minCursorDate: minTime,
-                    maxCursorDate: minTime
+                for(let date of dates) {
+                    if(date.start < minTime) minTime = date.start;
+                    if(date.start > maxTime) maxTime = date.start;
                 }
-            )
+            }
         }
+
+        minTime = new Date(minTime*1000).getFullYear();
+        maxTime = new Date(maxTime*1000).getFullYear();
+
+        this.setState(
+            {
+                minTime,
+                maxTime,
+                minCursorDate: minTime,
+                maxCursorDate: maxTime
+            }
+        )
     },
 
     _getAvailableYearsHtml(min, max) {
@@ -223,8 +234,12 @@ const Timeless = React.createClass({
             minCursorX = this._getRepositionCursorX('min', timeScale);
             maxCursorX = this._getRepositionCursorX('max', timeScale);
         } else {
-            minCursorX = ( wrapperSize / 4 ) + ( this.props.cursorWidth / 4 );
-            maxCursorX = ( wrapperSize / 4 ) * 3 - ( this.props.cursorWidth / 4 );
+            const minTime = new Date(this.props.minCursorDefaultTimestamp * 1000).getFullYear();
+            const maxTime = new Date(this.props.maxCursorDefaultTimestamp * 1000).getFullYear();
+            console.log(minTime);
+            console.log(maxTime);
+            minCursorX = this._getDateX(minTime,timeScale);
+            maxCursorX = this._getDateX(maxTime,timeScale);
         }
 
         this.setState(
@@ -236,8 +251,8 @@ const Timeless = React.createClass({
                 minCursorX,
                 maxCursorX
             }, () => {
-            this._updateValue();
-        });
+                this._updateValue();
+            });
     },
 
     _updateValue() {
@@ -286,6 +301,11 @@ const Timeless = React.createClass({
 
     _getRepositionCursorX(cursor, newTimescale) {
         return (this.state[`${cursor}CursorX`] * newTimescale) / this.state.timeScale;
+    },
+
+    _getDateX(year, timeScale) {
+        const currentTimeScale = timeScale ? timeScale :  this.state.timeScale;
+        return (year - this.state.minTime) * currentTimeScale;
     }
 });
 
