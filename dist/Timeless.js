@@ -28,15 +28,22 @@ var Timeless = _react2.default.createClass({
         return {
             dates: {},
             onChange: null,
-            onChangeDelay: 250,
+            onChangeDelay: 0,
             cursorWidth: 75,
             cursorSnap: false,
-            timeRangeDrag: false
+            timeRangeDrag: false,
+            cursorArrow: true,
+            disabled: false,
+            minTimestamp: 0,
+            maxTimestamp: 0,
+            minCursorDefaultTimestamp: 0,
+            maxCursorDefaultTimestamp: 0
         };
     },
     componentWillMount: function componentWillMount() {
         this._getMinMaxDates();
         this._addListeners();
+        this.delay = null;
     },
     componentWillUnmount: function componentWillUnmount() {
         this._removeListeners();
@@ -71,6 +78,11 @@ var Timeless = _react2.default.createClass({
             minCursorClass += ' timeline-animate';
             maxCursorClass += ' timeline-animate';
             timeRangeClass += ' timeline-animate';
+        }
+
+        if (this.props.cursorArrow) {
+            minCursorClass += ' cursor-arrow';
+            maxCursorClass += ' cursor-arrow';
         }
 
         return _react2.default.createElement(
@@ -136,55 +148,70 @@ var Timeless = _react2.default.createClass({
         });
     },
     _handleChange: function _handleChange() {
+        var _this3 = this;
+
         if (this.props.onChange !== null && typeof this.props.onChange === 'function') {
-            this.props.onChange(this.state);
+            clearTimeout(this.delay);
+
+            this.delay = setTimeout(function () {
+                _this3.props.onChange(_this3.state);
+            }, this.props.onChangeDelay);
         }
     },
     _getMinMaxDates: function _getMinMaxDates() {
         var dates = this.props.dates;
+        var _props = this.props;
+        var minTimestamp = _props.minTimestamp;
+        var maxTimestamp = _props.maxTimestamp;
+
         var minTime = undefined;
         var maxTime = undefined;
 
-        if (dates) {
-            minTime = dates[0].start;
-            maxTime = dates[0].start;
+        if (minTimestamp && maxTimestamp && minTimestamp !== maxTimestamp) {
+            minTime = minTimestamp;
+            maxTime = maxTimestamp;
+        } else {
+            if (dates) {
+                minTime = dates[0].start;
+                maxTime = dates[0].start;
 
-            var _iteratorNormalCompletion = true;
-            var _didIteratorError = false;
-            var _iteratorError = undefined;
+                var _iteratorNormalCompletion = true;
+                var _didIteratorError = false;
+                var _iteratorError = undefined;
 
-            try {
-                for (var _iterator = dates[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-                    var date = _step.value;
-
-                    if (date.start < minTime) minTime = date.start;
-                    if (date.start > maxTime) maxTime = date.start;
-                }
-            } catch (err) {
-                _didIteratorError = true;
-                _iteratorError = err;
-            } finally {
                 try {
-                    if (!_iteratorNormalCompletion && _iterator.return) {
-                        _iterator.return();
+                    for (var _iterator = dates[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+                        var date = _step.value;
+
+                        if (date.start < minTime) minTime = date.start;
+                        if (date.start > maxTime) maxTime = date.start;
                     }
+                } catch (err) {
+                    _didIteratorError = true;
+                    _iteratorError = err;
                 } finally {
-                    if (_didIteratorError) {
-                        throw _iteratorError;
+                    try {
+                        if (!_iteratorNormalCompletion && _iterator.return) {
+                            _iterator.return();
+                        }
+                    } finally {
+                        if (_didIteratorError) {
+                            throw _iteratorError;
+                        }
                     }
                 }
             }
-
-            minTime = new Date(minTime * 1000).getFullYear();
-            maxTime = new Date(maxTime * 1000).getFullYear();
-
-            this.setState({
-                minTime: minTime,
-                maxTime: maxTime,
-                minCursorDate: minTime,
-                maxCursorDate: minTime
-            });
         }
+
+        minTime = new Date(minTime * 1000).getFullYear();
+        maxTime = new Date(maxTime * 1000).getFullYear();
+
+        this.setState({
+            minTime: minTime,
+            maxTime: maxTime,
+            minCursorDate: minTime,
+            maxCursorDate: maxTime
+        });
     },
     _getAvailableYearsHtml: function _getAvailableYearsHtml(min, max) {
         var html = [];
@@ -218,14 +245,14 @@ var Timeless = _react2.default.createClass({
         window.removeEventListener('mousemove', this._handleDrag, true);
     },
     _handleMouseDown: function _handleMouseDown(cursor, event) {
-        var _this3 = this;
+        var _this4 = this;
 
         this.setState({
             animate: false,
             activeCursor: cursor,
             activeCursorOffsetClient: event.clientX - this.state[cursor + 'CursorX']
         }, function () {
-            window.addEventListener('mousemove', _this3._handleDrag, true);
+            window.addEventListener('mousemove', _this4._handleDrag, true);
         });
     },
     _handleResize: function _handleResize() {
@@ -240,7 +267,7 @@ var Timeless = _react2.default.createClass({
         window.removeEventListener('resize', this._handleResize, false);
     },
     _setWindowVars: function _setWindowVars() {
-        var _this4 = this;
+        var _this5 = this;
 
         var time = this.state.maxTime - this.state.minTime;
         var wrapperSize = this.timelineWrapper.offsetWidth;
@@ -260,8 +287,11 @@ var Timeless = _react2.default.createClass({
             minCursorX = this._getRepositionCursorX('min', timeScale);
             maxCursorX = this._getRepositionCursorX('max', timeScale);
         } else {
-            minCursorX = wrapperSize / 4 + this.props.cursorWidth / 4;
-            maxCursorX = wrapperSize / 4 * 3 - this.props.cursorWidth / 4;
+            var minTime = new Date(this.props.minCursorDefaultTimestamp * 1000).getFullYear();
+            var maxTime = new Date(this.props.maxCursorDefaultTimestamp * 1000).getFullYear();
+
+            minCursorX = this._getDateX(minTime, timeScale);
+            maxCursorX = this._getDateX(maxTime, timeScale);
         }
 
         this.setState({
@@ -272,15 +302,18 @@ var Timeless = _react2.default.createClass({
             minCursorX: minCursorX,
             maxCursorX: maxCursorX
         }, function () {
-            _this4._updateValue();
+            _this5._updateValue();
         });
     },
     _updateValue: function _updateValue() {
-        var _this5 = this;
+        var _this6 = this;
 
         var halfCursorWith = this.props.cursorWidth / 2;
         var minCursorDate = this.state.minTime + parseInt((this.state.minCursorX + halfCursorWith) / this.state.timeScale);
         var maxCursorDate = this.state.minTime + parseInt((this.state.maxCursorX + halfCursorWith) / this.state.timeScale);
+
+        if (minCursorDate === this.state.minCursorDate && maxCursorDate === this.state.maxCursorDate) return false;
+
         var minCursorTimestamp = this._getFirstDayTimestamp(minCursorDate);
         var maxCursorTimestamp = this._getLastDayTimestamp(maxCursorDate);
 
@@ -289,7 +322,7 @@ var Timeless = _react2.default.createClass({
             minCursorTimestamp: minCursorTimestamp,
             maxCursorTimestamp: maxCursorTimestamp
         }, function () {
-            _this5._handleChange();
+            _this6._handleChange();
         });
     },
     _getFirstDayTimestamp: function _getFirstDayTimestamp(year) {
@@ -301,7 +334,7 @@ var Timeless = _react2.default.createClass({
         return date.getTime() / 1000;
     },
     _transitionTo: function _transitionTo(year, event) {
-        var _this6 = this;
+        var _this7 = this;
 
         var minCursorDiff = Math.abs(year - this.state.minCursorDate);
         var maxCursorDiff = Math.abs(year - this.state.maxCursorDate);
@@ -313,11 +346,15 @@ var Timeless = _react2.default.createClass({
             activeCursor: activeCursor,
             activeCursorOffsetClient: this.props.cursorWidth / 2
         }, function () {
-            _this6._handleDrag({ clientX: clientX });
+            _this7._handleDrag({ clientX: clientX });
         });
     },
     _getRepositionCursorX: function _getRepositionCursorX(cursor, newTimescale) {
         return this.state[cursor + 'CursorX'] * newTimescale / this.state.timeScale;
+    },
+    _getDateX: function _getDateX(year, timeScale) {
+        var currentTimeScale = timeScale ? timeScale : this.state.timeScale;
+        return (year - this.state.minTime) * currentTimeScale;
     }
 });
 
