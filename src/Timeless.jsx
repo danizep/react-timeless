@@ -62,6 +62,7 @@ const Timeless = React.createClass({
         let minCursorClass = 'time-cursor time-cursor--min';
         let maxCursorClass = 'time-cursor time-cursor--max';
         let timeRangeClass = 'timeline-range';
+        let timelineWrapperClass = 'timeline-wrapper';
 
         if (this.state.animate) {
             //minCursorStyle.transition = maxCursorStyle.transition = timeRangeStyle.transition = 'all 0.25s ease';
@@ -75,8 +76,10 @@ const Timeless = React.createClass({
             maxCursorClass += ' cursor-arrow';
         }
 
+        if (this.props.disabled) timelineWrapperClass += ' timeline--disabled';
+
         return (
-            <div className="timeline-wrapper" ref={(ref) => this.timelineWrapper = ref}>
+            <div className={timelineWrapperClass} ref={(ref) => this.timelineWrapper = ref}>
                 <div className="timeline-available">
                     {this._getAvailableYearsHtml(this.state.minTime, this.state.maxTime)}
                 </div>

@@ -11,7 +11,8 @@ ReactDOM.render(
               minCursorDefaultTimestamp={601257600}
               maxCursorDefaultTimestamp={917980800}
               onChangeDelay={250}
-              onChange={appendInfo} />,
+              onChange={appendInfo}
+        />,
     document.getElementById('example')
 );
 
