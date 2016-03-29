@@ -101,7 +101,30 @@ const Timeless = React.createClass({
         );
     },
 
+    updateCursors(data) {
+        let state = {
+            animate: true,
+        };
+
+        if (data.minCursorDefaultTimestamp) {
+            const minTime = new Date(data.minCursorDefaultTimestamp * 1000).getFullYear();
+            state.minCursorX = this._getDateX(minTime);
+        }
+
+        if (data.maxCursorDefaultTimestamp) {
+            const maxTime = new Date(data.maxCursorDefaultTimestamp * 1000).getFullYear();
+            state.maxCursorX = this._getDateX(maxTime);
+        }
+
+        this.setState(
+            state,
+            () => {
+                this._updateValue();
+            });
+    },
+
     _handleDrag(event) {
+        if (this.props.disabled) return false;
         let state = {};
 
         const index = this.state.activeCursor;
@@ -320,4 +343,3 @@ const Timeless = React.createClass({
 });
 
 export default Timeless;
-

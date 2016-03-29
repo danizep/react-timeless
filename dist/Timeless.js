@@ -72,6 +72,7 @@ var Timeless = _react2.default.createClass({
         var minCursorClass = 'time-cursor time-cursor--min';
         var maxCursorClass = 'time-cursor time-cursor--max';
         var timeRangeClass = 'timeline-range';
+        var timelineWrapperClass = 'timeline-wrapper';
 
         if (this.state.animate) {
             //minCursorStyle.transition = maxCursorStyle.transition = timeRangeStyle.transition = 'all 0.25s ease';
@@ -85,9 +86,11 @@ var Timeless = _react2.default.createClass({
             maxCursorClass += ' cursor-arrow';
         }
 
+        if (this.props.disabled) timelineWrapperClass += ' timeline--disabled';
+
         return _react2.default.createElement(
             'div',
-            { className: 'timeline-wrapper', ref: function ref(_ref3) {
+            { className: timelineWrapperClass, ref: function ref(_ref3) {
                     return _this.timelineWrapper = _ref3;
                 } },
             _react2.default.createElement(
@@ -122,9 +125,31 @@ var Timeless = _react2.default.createClass({
             )
         );
     },
-    _handleDrag: function _handleDrag(event) {
+    updateCursors: function updateCursors(data) {
         var _this2 = this;
 
+        var state = {
+            animate: true
+        };
+
+        if (data.minCursorDefaultTimestamp) {
+            var minTime = new Date(data.minCursorDefaultTimestamp * 1000).getFullYear();
+            state.minCursorX = this._getDateX(minTime);
+        }
+
+        if (data.maxCursorDefaultTimestamp) {
+            var maxTime = new Date(data.maxCursorDefaultTimestamp * 1000).getFullYear();
+            state.maxCursorX = this._getDateX(maxTime);
+        }
+
+        this.setState(state, function () {
+            _this2._updateValue();
+        });
+    },
+    _handleDrag: function _handleDrag(event) {
+        var _this3 = this;
+
+        if (this.props.disabled) return false;
         var state = {};
 
         var index = this.state.activeCursor;
@@ -144,17 +169,17 @@ var Timeless = _react2.default.createClass({
         state[index + 'CursorX'] = translateValue;
 
         this.setState(state, function () {
-            _this2._updateValue();
+            _this3._updateValue();
         });
     },
     _handleChange: function _handleChange() {
-        var _this3 = this;
+        var _this4 = this;
 
         if (this.props.onChange !== null && typeof this.props.onChange === 'function') {
             clearTimeout(this.delay);
 
             this.delay = setTimeout(function () {
-                _this3.props.onChange(_this3.state);
+                _this4.props.onChange(_this4.state);
             }, this.props.onChangeDelay);
         }
     },
@@ -245,14 +270,14 @@ var Timeless = _react2.default.createClass({
         window.removeEventListener('mousemove', this._handleDrag, true);
     },
     _handleMouseDown: function _handleMouseDown(cursor, event) {
-        var _this4 = this;
+        var _this5 = this;
 
         this.setState({
             animate: false,
             activeCursor: cursor,
             activeCursorOffsetClient: event.clientX - this.state[cursor + 'CursorX']
         }, function () {
-            window.addEventListener('mousemove', _this4._handleDrag, true);
+            window.addEventListener('mousemove', _this5._handleDrag, true);
         });
     },
     _handleResize: function _handleResize() {
@@ -267,7 +292,7 @@ var Timeless = _react2.default.createClass({
         window.removeEventListener('resize', this._handleResize, false);
     },
     _setWindowVars: function _setWindowVars() {
-        var _this5 = this;
+        var _this6 = this;
 
         var time = this.state.maxTime - this.state.minTime;
         var wrapperSize = this.timelineWrapper.offsetWidth;
@@ -302,11 +327,11 @@ var Timeless = _react2.default.createClass({
             minCursorX: minCursorX,
             maxCursorX: maxCursorX
         }, function () {
-            _this5._updateValue();
+            _this6._updateValue();
         });
     },
     _updateValue: function _updateValue() {
-        var _this6 = this;
+        var _this7 = this;
 
         var halfCursorWith = this.props.cursorWidth / 2;
         var minCursorDate = this.state.minTime + parseInt((this.state.minCursorX + halfCursorWith) / this.state.timeScale);
@@ -322,7 +347,7 @@ var Timeless = _react2.default.createClass({
             minCursorTimestamp: minCursorTimestamp,
             maxCursorTimestamp: maxCursorTimestamp
         }, function () {
-            _this6._handleChange();
+            _this7._handleChange();
         });
     },
     _getFirstDayTimestamp: function _getFirstDayTimestamp(year) {
@@ -334,7 +359,7 @@ var Timeless = _react2.default.createClass({
         return date.getTime() / 1000;
     },
     _transitionTo: function _transitionTo(year, event) {
-        var _this7 = this;
+        var _this8 = this;
 
         var minCursorDiff = Math.abs(year - this.state.minCursorDate);
         var maxCursorDiff = Math.abs(year - this.state.maxCursorDate);
@@ -346,7 +371,7 @@ var Timeless = _react2.default.createClass({
             activeCursor: activeCursor,
             activeCursorOffsetClient: this.props.cursorWidth / 2
         }, function () {
-            _this7._handleDrag({ clientX: clientX });
+            _this8._handleDrag({ clientX: clientX });
         });
     },
     _getRepositionCursorX: function _getRepositionCursorX(cursor, newTimescale) {

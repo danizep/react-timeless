@@ -9,3 +9,21 @@ body {
 h1, p {
     color: #000;
 }
+
+.example-controls {
+    margin-top: 15px;
+}
+
+button {
+    background: #2895D4;
+    border: none;
+    border-radius: 3px;
+    padding: 10px 15px;
+    color: white;
+    margin-right: 5px;
+    cursor: pointer;
+}
+
+button:hover {
+    background: #29a3e3;
+}

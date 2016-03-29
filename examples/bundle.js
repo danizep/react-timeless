@@ -54,29 +54,15 @@
 
 	var _reactDom2 = _interopRequireDefault(_reactDom);
 
-	var _Timeless = __webpack_require__(159);
+	var _Main = __webpack_require__(164);
 
-	var _Timeless2 = _interopRequireDefault(_Timeless);
+	var _Main2 = _interopRequireDefault(_Main);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 	__webpack_require__(160);
 
-	_reactDom2.default.render(_react2.default.createElement(_Timeless2.default, { minTimestamp: 601257600,
-	    maxTimestamp: 1217980800,
-	    minCursorDefaultTimestamp: 601257600,
-	    maxCursorDefaultTimestamp: 917980800,
-	    onChangeDelay: 250,
-	    onChange: appendInfo
-	}), document.getElementById('example'));
-
-	function appendInfo(data) {
-	    console.info(data);
-	    document.getElementById('minT').innerHTML = data.minCursorTimestamp;
-	    document.getElementById('maxT').innerHTML = data.maxCursorTimestamp;
-	    document.getElementById('minY').innerHTML = data.minCursorDate;
-	    document.getElementById('maxY').innerHTML = data.maxCursorDate;
-	}
+	_reactDom2.default.render(_react2.default.createElement(_Main2.default, null), document.getElementById('example'));
 
 /***/ },
 /* 1 */
@@ -19810,9 +19796,31 @@
 	            )
 	        );
 	    },
-	    _handleDrag: function _handleDrag(event) {
+	    updateCursors: function updateCursors(data) {
 	        var _this2 = this;
 
+	        var state = {
+	            animate: true
+	        };
+
+	        if (data.minCursorDefaultTimestamp) {
+	            var minTime = new Date(data.minCursorDefaultTimestamp * 1000).getFullYear();
+	            state.minCursorX = this._getDateX(minTime);
+	        }
+
+	        if (data.maxCursorDefaultTimestamp) {
+	            var maxTime = new Date(data.maxCursorDefaultTimestamp * 1000).getFullYear();
+	            state.maxCursorX = this._getDateX(maxTime);
+	        }
+
+	        this.setState(state, function () {
+	            _this2._updateValue();
+	        });
+	    },
+	    _handleDrag: function _handleDrag(event) {
+	        var _this3 = this;
+
+	        if (this.props.disabled) return false;
 	        var state = {};
 
 	        var index = this.state.activeCursor;
@@ -19832,17 +19840,17 @@
 	        state[index + 'CursorX'] = translateValue;
 
 	        this.setState(state, function () {
-	            _this2._updateValue();
+	            _this3._updateValue();
 	        });
 	    },
 	    _handleChange: function _handleChange() {
-	        var _this3 = this;
+	        var _this4 = this;
 
 	        if (this.props.onChange !== null && typeof this.props.onChange === 'function') {
 	            clearTimeout(this.delay);
 
 	            this.delay = setTimeout(function () {
-	                _this3.props.onChange(_this3.state);
+	                _this4.props.onChange(_this4.state);
 	            }, this.props.onChangeDelay);
 	        }
 	    },
@@ -19933,14 +19941,14 @@
 	        window.removeEventListener('mousemove', this._handleDrag, true);
 	    },
 	    _handleMouseDown: function _handleMouseDown(cursor, event) {
-	        var _this4 = this;
+	        var _this5 = this;
 
 	        this.setState({
 	            animate: false,
 	            activeCursor: cursor,
 	            activeCursorOffsetClient: event.clientX - this.state[cursor + 'CursorX']
 	        }, function () {
-	            window.addEventListener('mousemove', _this4._handleDrag, true);
+	            window.addEventListener('mousemove', _this5._handleDrag, true);
 	        });
 	    },
 	    _handleResize: function _handleResize() {
@@ -19955,7 +19963,7 @@
 	        window.removeEventListener('resize', this._handleResize, false);
 	    },
 	    _setWindowVars: function _setWindowVars() {
-	        var _this5 = this;
+	        var _this6 = this;
 
 	        var time = this.state.maxTime - this.state.minTime;
 	        var wrapperSize = this.timelineWrapper.offsetWidth;
@@ -19990,11 +19998,11 @@
 	            minCursorX: minCursorX,
 	            maxCursorX: maxCursorX
 	        }, function () {
-	            _this5._updateValue();
+	            _this6._updateValue();
 	        });
 	    },
 	    _updateValue: function _updateValue() {
-	        var _this6 = this;
+	        var _this7 = this;
 
 	        var halfCursorWith = this.props.cursorWidth / 2;
 	        var minCursorDate = this.state.minTime + parseInt((this.state.minCursorX + halfCursorWith) / this.state.timeScale);
@@ -20010,7 +20018,7 @@
 	            minCursorTimestamp: minCursorTimestamp,
 	            maxCursorTimestamp: maxCursorTimestamp
 	        }, function () {
-	            _this6._handleChange();
+	            _this7._handleChange();
 	        });
 	    },
 	    _getFirstDayTimestamp: function _getFirstDayTimestamp(year) {
@@ -20022,7 +20030,7 @@
 	        return date.getTime() / 1000;
 	    },
 	    _transitionTo: function _transitionTo(year, event) {
-	        var _this7 = this;
+	        var _this8 = this;
 
 	        var minCursorDiff = Math.abs(year - this.state.minCursorDate);
 	        var maxCursorDiff = Math.abs(year - this.state.maxCursorDate);
@@ -20034,7 +20042,7 @@
 	            activeCursor: activeCursor,
 	            activeCursorOffsetClient: this.props.cursorWidth / 2
 	        }, function () {
-	            _this7._handleDrag({ clientX: clientX });
+	            _this8._handleDrag({ clientX: clientX });
 	        });
 	    },
 	    _getRepositionCursorX: function _getRepositionCursorX(cursor, newTimescale) {
@@ -20397,6 +20405,94 @@
 			URL.revokeObjectURL(oldSrc);
 	}
 
+
+/***/ },
+/* 164 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+
+	var _react = __webpack_require__(1);
+
+	var _react2 = _interopRequireDefault(_react);
+
+	var _reactDom = __webpack_require__(158);
+
+	var _reactDom2 = _interopRequireDefault(_reactDom);
+
+	var _Timeless = __webpack_require__(159);
+
+	var _Timeless2 = _interopRequireDefault(_Timeless);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	var Main = _react2.default.createClass({
+	    displayName: 'Main',
+	    getInitialState: function getInitialState() {
+	        return {
+	            disabled: false
+	        };
+	    },
+	    render: function render() {
+	        var _this = this;
+
+	        return _react2.default.createElement(
+	            'div',
+	            null,
+	            _react2.default.createElement(_Timeless2.default, { ref: function ref(node) {
+	                    _this.timeless = node;
+	                },
+	                minTimestamp: 601257600,
+	                maxTimestamp: 1217980800,
+	                minCursorDefaultTimestamp: 601257600,
+	                maxCursorDefaultTimestamp: 917980800,
+	                onChangeDelay: 250,
+	                onChange: this._appendInfo,
+	                disabled: this.state.disabled
+	            }),
+	            _react2.default.createElement(
+	                'div',
+	                { className: 'example-controls' },
+	                _react2.default.createElement(
+	                    'button',
+	                    { type: 'button', onClick: this._toggleDisable },
+	                    'disable'
+	                ),
+	                _react2.default.createElement(
+	                    'button',
+	                    { type: 'button', onClick: this._reset },
+	                    'reset'
+	                )
+	            )
+	        );
+	    },
+	    _toggleDisable: function _toggleDisable() {
+	        var disabled = !this.state.disabled;
+
+	        this.setState({
+	            disabled: disabled
+	        });
+	    },
+	    _reset: function _reset() {
+	        this.timeless.updateCursors({
+	            minCursorDefaultTimestamp: 601257600,
+	            maxCursorDefaultTimestamp: 917980800
+	        });
+	    },
+	    _appendInfo: function _appendInfo(data) {
+	        console.info(data);
+	        document.getElementById('minT').innerHTML = data.minCursorTimestamp;
+	        document.getElementById('maxT').innerHTML = data.maxCursorTimestamp;
+	        document.getElementById('minY').innerHTML = data.minCursorDate;
+	        document.getElementById('maxY').innerHTML = data.maxCursorDate;
+	    }
+	});
+
+	exports.default = Main;
 
 /***/ }
 /******/ ]);
