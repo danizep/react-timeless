@@ -24,8 +24,8 @@ const Main = React.createClass({
                           disabled={this.state.disabled}
                     />
                 <div className="example-controls">
-                    <button type="button" onClick={this._toggleDisable}>disable</button>
                     <button type="button" onClick={this._reset}>reset</button>
+                    <button type="button" onClick={this._toggleDisable}>{this.state.disabled ? 'enable' : 'disable'}</button>
                 </div>
             </div>
         );
