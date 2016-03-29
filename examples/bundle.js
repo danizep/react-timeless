@@ -54,13 +54,13 @@
 
 	var _reactDom2 = _interopRequireDefault(_reactDom);
 
-	var _Main = __webpack_require__(164);
+	var _Main = __webpack_require__(159);
 
 	var _Main2 = _interopRequireDefault(_Main);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-	__webpack_require__(160);
+	__webpack_require__(161);
 
 	_reactDom2.default.render(_react2.default.createElement(_Main2.default, null), document.getElementById('example'));
 
@@ -19683,6 +19683,94 @@
 
 	var _reactDom2 = _interopRequireDefault(_reactDom);
 
+	var _Timeless = __webpack_require__(160);
+
+	var _Timeless2 = _interopRequireDefault(_Timeless);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	var Main = _react2.default.createClass({
+	    displayName: 'Main',
+	    getInitialState: function getInitialState() {
+	        return {
+	            disabled: false
+	        };
+	    },
+	    render: function render() {
+	        var _this = this;
+
+	        return _react2.default.createElement(
+	            'div',
+	            null,
+	            _react2.default.createElement(_Timeless2.default, { ref: function ref(node) {
+	                    _this.timeless = node;
+	                },
+	                minTimestamp: 601257600,
+	                maxTimestamp: 1217980800,
+	                minCursorDefaultTimestamp: 601257600,
+	                maxCursorDefaultTimestamp: 917980800,
+	                onChangeDelay: 250,
+	                onChange: this._appendInfo,
+	                disabled: this.state.disabled
+	            }),
+	            _react2.default.createElement(
+	                'div',
+	                { className: 'example-controls' },
+	                _react2.default.createElement(
+	                    'button',
+	                    { type: 'button', onClick: this._toggleDisable },
+	                    'disable'
+	                ),
+	                _react2.default.createElement(
+	                    'button',
+	                    { type: 'button', onClick: this._reset },
+	                    'reset'
+	                )
+	            )
+	        );
+	    },
+	    _toggleDisable: function _toggleDisable() {
+	        var disabled = !this.state.disabled;
+
+	        this.setState({
+	            disabled: disabled
+	        });
+	    },
+	    _reset: function _reset() {
+	        this.timeless.updateCursors({
+	            minCursorDefaultTimestamp: 601257600,
+	            maxCursorDefaultTimestamp: 917980800
+	        });
+	    },
+	    _appendInfo: function _appendInfo(data) {
+	        console.info(data);
+	        document.getElementById('minT').innerHTML = data.minCursorTimestamp;
+	        document.getElementById('maxT').innerHTML = data.maxCursorTimestamp;
+	        document.getElementById('minY').innerHTML = data.minCursorDate;
+	        document.getElementById('maxY').innerHTML = data.maxCursorDate;
+	    }
+	});
+
+	exports.default = Main;
+
+/***/ },
+/* 160 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+
+	var _react = __webpack_require__(1);
+
+	var _react2 = _interopRequireDefault(_react);
+
+	var _reactDom = __webpack_require__(158);
+
+	var _reactDom2 = _interopRequireDefault(_reactDom);
+
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 	var Timeless = _react2.default.createClass({
@@ -19721,6 +19809,13 @@
 	    },
 	    componentDidMount: function componentDidMount() {
 	        this._setWindowVars();
+	    },
+	    componentWillReceiveProps: function componentWillReceiveProps(nextProps) {
+	        if (nextProps.disabled !== this.props.disabled) {
+	            this.setState({
+	                animate: false
+	            });
+	        }
 	    },
 	    render: function render() {
 	        var _this = this;
@@ -20057,13 +20152,13 @@
 	exports.default = Timeless;
 
 /***/ },
-/* 160 */
+/* 161 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// style-loader: Adds some css to the DOM by adding a <style> tag
 
 	// load the styles
-	var content = __webpack_require__(161);
+	var content = __webpack_require__(162);
 	if(typeof content === 'string') content = [[module.id, content, '']];
 	// add the styles to the DOM
 	var update = __webpack_require__(163)(content, {});
@@ -20083,73 +20178,17 @@
 	}
 
 /***/ },
-/* 161 */
+/* 162 */
 /***/ function(module, exports, __webpack_require__) {
 
-	exports = module.exports = __webpack_require__(162)();
+	exports = module.exports = __webpack_require__(164)();
 	// imports
 
 
 	// module
-	exports.push([module.id, "/* TIMELESS STYLES */\n.timeline-wrapper {\n  line-height: 1;\n  width: 100%;\n  height: 50px;\n  overflow: hidden;\n  background-color: #F6F6F6;\n  position: relative;\n  border-radius: 5px;\n  color: #ccc;\n  user-select: none;\n  -moz-user-select: none;\n  -webkit-user-select: none;\n  -ms-user-select: none; }\n\n.timeline-available {\n  height: inherit;\n  display: inline-flex;\n  position: absolute;\n  user-select: none;\n  z-index: 1; }\n\n.time-block {\n  width: 200px;\n  float: left;\n  padding: 18px 0 0 0;\n  user-select: none;\n  -moz-user-select: none;\n  -webkit-user-select: none;\n  -ms-user-select: none;\n  text-align: center;\n  font-size: smaller; }\n\n.timeline-range {\n  height: inherit;\n  background-color: #8DC3E4;\n  position: absolute;\n  border-radius: inherit;\n  user-select: none;\n  -moz-user-select: none;\n  -webkit-user-select: none;\n  -ms-user-select: none;\n  box-sizing: border-box;\n  overflow: hidden; }\n\n.time-block--year {\n  transition: opacity 500ms ease, color 500ms ease;\n  cursor: pointer; }\n\n.time-block--in-range {\n  color: #fff; }\n\n.time-block--active {\n  opacity: 0; }\n\n.time-cursor {\n  position: absolute;\n  top: 0;\n  width: 100px;\n  height: inherit;\n  padding: 18px 0 15px 0;\n  background-color: #2895D4;\n  border-radius: inherit;\n  text-align: center;\n  cursor: ew-resize;\n  color: #fff;\n  user-select: none;\n  -moz-user-select: none;\n  -webkit-user-select: none;\n  -ms-user-select: none;\n  font-weight: 300;\n  box-sizing: border-box;\n  z-index: 2; }\n\n.timeline-animate {\n  -webkit-transition: all 250ms ease;\n  -moz-transition: all 250ms ease;\n  -o-transition: all 250ms ease;\n  transition: all 250ms ease; }\n\n.time-cursor--min.cursor-arrow:before {\n  content: '';\n  position: absolute;\n  top: 0;\n  left: 97%;\n  width: 0;\n  height: 0;\n  border: 25px solid transparent;\n  border-left: 12px solid #2895D4; }\n\n.time-cursor--max.cursor-arrow:after {\n  content: '';\n  position: absolute;\n  top: 0;\n  right: 97%;\n  width: 0;\n  height: 0;\n  border: 25px solid transparent;\n  border-right: 12px solid #2895D4; }\n", ""]);
+	exports.push([module.id, "/* TIMELESS STYLES */\n.timeline-wrapper {\n  line-height: 1;\n  width: 100%;\n  height: 50px;\n  overflow: hidden;\n  background-color: #F6F6F6;\n  position: relative;\n  border-radius: 5px;\n  color: #ccc;\n  user-select: none;\n  -moz-user-select: none;\n  -webkit-user-select: none;\n  -ms-user-select: none; }\n  .timeline-wrapper.timeline--disabled {\n    cursor: not-allowed; }\n    .timeline-wrapper.timeline--disabled .timeline-range {\n      background-color: #cbe4f3;\n      cursor: not-allowed; }\n    .timeline-wrapper.timeline--disabled .time-cursor {\n      background-color: #66b5e2;\n      cursor: not-allowed; }\n    .timeline-wrapper.timeline--disabled .cursor-arrow:after {\n      border-right-color: #66b5e2; }\n    .timeline-wrapper.timeline--disabled .cursor-arrow:before {\n      border-left-color: #66b5e2; }\n    .timeline-wrapper.timeline--disabled .time-block--year {\n      cursor: not-allowed; }\n\n.timeline-available {\n  height: inherit;\n  display: inline-flex;\n  position: absolute;\n  user-select: none;\n  z-index: 1; }\n\n.time-block {\n  width: 200px;\n  float: left;\n  padding: 18px 0 0 0;\n  user-select: none;\n  -moz-user-select: none;\n  -webkit-user-select: none;\n  -ms-user-select: none;\n  text-align: center;\n  font-size: smaller; }\n\n.timeline-range {\n  height: inherit;\n  background-color: #8DC3E4;\n  position: absolute;\n  border-radius: inherit;\n  user-select: none;\n  -moz-user-select: none;\n  -webkit-user-select: none;\n  -ms-user-select: none;\n  box-sizing: border-box;\n  overflow: hidden; }\n\n.time-block--year {\n  transition: opacity 500ms ease, color 500ms ease;\n  cursor: pointer; }\n\n.time-block--in-range {\n  color: #fff; }\n\n.time-block--active {\n  opacity: 0; }\n\n.time-cursor {\n  position: absolute;\n  top: 0;\n  width: 100px;\n  height: inherit;\n  padding: 18px 0 15px 0;\n  background-color: #2895D4;\n  border-radius: inherit;\n  text-align: center;\n  cursor: ew-resize;\n  color: #fff;\n  user-select: none;\n  -moz-user-select: none;\n  -webkit-user-select: none;\n  -ms-user-select: none;\n  font-weight: 300;\n  box-sizing: border-box;\n  z-index: 2; }\n\n.timeline-animate {\n  -webkit-transition: all 250ms ease;\n  -moz-transition: all 250ms ease;\n  -o-transition: all 250ms ease;\n  transition: all 250ms ease; }\n\n.time-cursor--min.cursor-arrow:before {\n  content: '';\n  position: absolute;\n  top: 0;\n  left: 97%;\n  width: 0;\n  height: 0;\n  border: 25px solid transparent;\n  border-left: 12px solid #2895D4; }\n\n.time-cursor--max.cursor-arrow:after {\n  content: '';\n  position: absolute;\n  top: 0;\n  right: 97%;\n  width: 0;\n  height: 0;\n  border: 25px solid transparent;\n  border-right: 12px solid #2895D4; }\n", ""]);
 
 	// exports
-
-
-/***/ },
-/* 162 */
-/***/ function(module, exports) {
-
-	/*
-		MIT License http://www.opensource.org/licenses/mit-license.php
-		Author Tobias Koppers @sokra
-	*/
-	// css base code, injected by the css-loader
-	module.exports = function() {
-		var list = [];
-
-		// return the list of modules as css string
-		list.toString = function toString() {
-			var result = [];
-			for(var i = 0; i < this.length; i++) {
-				var item = this[i];
-				if(item[2]) {
-					result.push("@media " + item[2] + "{" + item[1] + "}");
-				} else {
-					result.push(item[1]);
-				}
-			}
-			return result.join("");
-		};
-
-		// import a list of modules into the list
-		list.i = function(modules, mediaQuery) {
-			if(typeof modules === "string")
-				modules = [[null, modules, ""]];
-			var alreadyImportedModules = {};
-			for(var i = 0; i < this.length; i++) {
-				var id = this[i][0];
-				if(typeof id === "number")
-					alreadyImportedModules[id] = true;
-			}
-			for(i = 0; i < modules.length; i++) {
-				var item = modules[i];
-				// skip already imported module
-				// this implementation is not 100% perfect for weird media query combinations
-				//  when a module is imported multiple times with different media queries.
-				//  I hope this will never occur (Hey this way we have smaller bundles)
-				if(typeof item[0] !== "number" || !alreadyImportedModules[item[0]]) {
-					if(mediaQuery && !item[2]) {
-						item[2] = mediaQuery;
-					} else if(mediaQuery) {
-						item[2] = "(" + item[2] + ") and (" + mediaQuery + ")";
-					}
-					list.push(item);
-				}
-			}
-		};
-		return list;
-	};
 
 
 /***/ },
@@ -20408,91 +20447,59 @@
 
 /***/ },
 /* 164 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ function(module, exports) {
 
-	'use strict';
+	/*
+		MIT License http://www.opensource.org/licenses/mit-license.php
+		Author Tobias Koppers @sokra
+	*/
+	// css base code, injected by the css-loader
+	module.exports = function() {
+		var list = [];
 
-	Object.defineProperty(exports, "__esModule", {
-	    value: true
-	});
+		// return the list of modules as css string
+		list.toString = function toString() {
+			var result = [];
+			for(var i = 0; i < this.length; i++) {
+				var item = this[i];
+				if(item[2]) {
+					result.push("@media " + item[2] + "{" + item[1] + "}");
+				} else {
+					result.push(item[1]);
+				}
+			}
+			return result.join("");
+		};
 
-	var _react = __webpack_require__(1);
+		// import a list of modules into the list
+		list.i = function(modules, mediaQuery) {
+			if(typeof modules === "string")
+				modules = [[null, modules, ""]];
+			var alreadyImportedModules = {};
+			for(var i = 0; i < this.length; i++) {
+				var id = this[i][0];
+				if(typeof id === "number")
+					alreadyImportedModules[id] = true;
+			}
+			for(i = 0; i < modules.length; i++) {
+				var item = modules[i];
+				// skip already imported module
+				// this implementation is not 100% perfect for weird media query combinations
+				//  when a module is imported multiple times with different media queries.
+				//  I hope this will never occur (Hey this way we have smaller bundles)
+				if(typeof item[0] !== "number" || !alreadyImportedModules[item[0]]) {
+					if(mediaQuery && !item[2]) {
+						item[2] = mediaQuery;
+					} else if(mediaQuery) {
+						item[2] = "(" + item[2] + ") and (" + mediaQuery + ")";
+					}
+					list.push(item);
+				}
+			}
+		};
+		return list;
+	};
 
-	var _react2 = _interopRequireDefault(_react);
-
-	var _reactDom = __webpack_require__(158);
-
-	var _reactDom2 = _interopRequireDefault(_reactDom);
-
-	var _Timeless = __webpack_require__(159);
-
-	var _Timeless2 = _interopRequireDefault(_Timeless);
-
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-	var Main = _react2.default.createClass({
-	    displayName: 'Main',
-	    getInitialState: function getInitialState() {
-	        return {
-	            disabled: false
-	        };
-	    },
-	    render: function render() {
-	        var _this = this;
-
-	        return _react2.default.createElement(
-	            'div',
-	            null,
-	            _react2.default.createElement(_Timeless2.default, { ref: function ref(node) {
-	                    _this.timeless = node;
-	                },
-	                minTimestamp: 601257600,
-	                maxTimestamp: 1217980800,
-	                minCursorDefaultTimestamp: 601257600,
-	                maxCursorDefaultTimestamp: 917980800,
-	                onChangeDelay: 250,
-	                onChange: this._appendInfo,
-	                disabled: this.state.disabled
-	            }),
-	            _react2.default.createElement(
-	                'div',
-	                { className: 'example-controls' },
-	                _react2.default.createElement(
-	                    'button',
-	                    { type: 'button', onClick: this._toggleDisable },
-	                    'disable'
-	                ),
-	                _react2.default.createElement(
-	                    'button',
-	                    { type: 'button', onClick: this._reset },
-	                    'reset'
-	                )
-	            )
-	        );
-	    },
-	    _toggleDisable: function _toggleDisable() {
-	        var disabled = !this.state.disabled;
-
-	        this.setState({
-	            disabled: disabled
-	        });
-	    },
-	    _reset: function _reset() {
-	        this.timeless.updateCursors({
-	            minCursorDefaultTimestamp: 601257600,
-	            maxCursorDefaultTimestamp: 917980800
-	        });
-	    },
-	    _appendInfo: function _appendInfo(data) {
-	        console.info(data);
-	        document.getElementById('minT').innerHTML = data.minCursorTimestamp;
-	        document.getElementById('maxT').innerHTML = data.maxCursorTimestamp;
-	        document.getElementById('minY').innerHTML = data.minCursorDate;
-	        document.getElementById('maxY').innerHTML = data.maxCursorDate;
-	    }
-	});
-
-	exports.default = Main;
 
 /***/ }
 /******/ ]);

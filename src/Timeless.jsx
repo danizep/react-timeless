@@ -43,6 +43,16 @@ const Timeless = React.createClass({
         this._setWindowVars();
     },
 
+    componentWillReceiveProps(nextProps) {
+        if (nextProps.disabled !== this.props.disabled) {
+            this.setState(
+                {
+                    animate: false
+                }
+            )
+        }
+    },
+
     render() {
         const minCursorStyle = {
             transform: `translate3d(${this.state.minCursorX}px,0,0)`,
