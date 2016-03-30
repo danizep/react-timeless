@@ -8,7 +8,8 @@ const Timeless = React.createClass({
             minCursorX: 0,
             maxCursorX: 0,
             minCursorDate: 0,
-            maxCursorDate: 0
+            maxCursorDate: 0,
+            multiplier: 1
         }
     },
 
@@ -25,7 +26,7 @@ const Timeless = React.createClass({
             minTimestamp: 0,
             maxTimestamp: 0,
             minCursorDefaultTimestamp: 0,
-            maxCursorDefaultTimestamp: 0
+            maxCursorDefaultTimestamp: 0,
         }
     },
 
@@ -91,7 +92,7 @@ const Timeless = React.createClass({
         return (
             <div className={timelineWrapperClass} ref={(ref) => this.timelineWrapper = ref}>
                 <div className="timeline-available">
-                    {this._getAvailableYearsHtml(this.state.minTime, this.state.maxTime)}
+                    {this._getAvailableYearsHtml()}
                 </div>
                 <div className={timeRangeClass} style={timeRangeStyle}></div>
                 <div className={minCursorClass}
@@ -203,13 +204,16 @@ const Timeless = React.createClass({
         )
     },
 
-    _getAvailableYearsHtml(min, max) {
+    _getAvailableYearsHtml() {
+        let min = this.state.minTime;
+        let max = this.state.maxTime;
+        const multiplier = this.state.multiplier;
         let html = [];
 
         if ( typeof this.state.timeScale === 'undefined' ) return null;
 
         const style = {
-            width: this.state.timeScale + 'px'
+            width: this.state.timeScale * multiplier + 'px'
         };
 
         for(min; min <= max; min++) {
@@ -218,11 +222,17 @@ const Timeless = React.createClass({
             if (min > this.state.minCursorDate && min < this.state.maxCursorDate) className += " time-block--in-range";
             if (min === this.state.minCursorDate || min === this.state.maxCursorDate) className += " time-block--active";
 
-            html.push(
-                (<div className="time-block" style={style} key={`year-${min}`} onClick={this._transitionTo.bind(this, min)} >
-                    <span className={className}>{min}</span>
-                </div>)
-            )
+            if (min % multiplier === 0) {
+                html.push(
+                    (<div className="time-block" style={style} key={`year-${min}`} onClick={this._transitionTo.bind(this, min)} >
+                        <span className={className}>{min}</span>
+                    </div>)
+                )
+            } else {
+                html.push(null)
+            }
+
+
         }
 
         return html;
@@ -260,15 +270,24 @@ const Timeless = React.createClass({
     },
 
     _setWindowVars() {
-        const time = this.state.maxTime - this.state.minTime;
+        const time = this.state.maxTime - this.state.minTime + 1;
         const wrapperSize = this.timelineWrapper.offsetWidth;
         const wrapperOffsetLeft = this.timelineWrapper.offsetLeft;
 
+        let multiplier = 1;
         let {minCursorX, maxCursorX} =  this.state;
         let timeScale = wrapperSize / time;
 
-        if (timeScale < this.props.cursorWidth) {
-            timeScale = this.props.cursorWidth;
+        //if (timeScale < this.props.cursorWidth) {
+        //    timeScale = this.props.cursorWidth;
+        //}
+
+        if (timeScale * 1.5 < this.props.cursorWidth) {
+            multiplier = 2;
+        }
+
+        if (timeScale * 2.5 < this.props.cursorWidth) {
+            multiplier = 5;
         }
 
         if (this.state.timeScale) {
@@ -289,7 +308,8 @@ const Timeless = React.createClass({
                 wrapperOffsetLeft,
                 timeScale,
                 minCursorX,
-                maxCursorX
+                maxCursorX,
+                multiplier
             }, () => {
                 this._updateValue();
             });

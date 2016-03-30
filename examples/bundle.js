@@ -19780,7 +19780,8 @@
 	            minCursorX: 0,
 	            maxCursorX: 0,
 	            minCursorDate: 0,
-	            maxCursorDate: 0
+	            maxCursorDate: 0,
+	            multiplier: 1
 	        };
 	    },
 	    getDefaultProps: function getDefaultProps() {
@@ -19862,7 +19863,7 @@
 	            _react2.default.createElement(
 	                'div',
 	                { className: 'timeline-available' },
-	                this._getAvailableYearsHtml(this.state.minTime, this.state.maxTime)
+	                this._getAvailableYearsHtml()
 	            ),
 	            _react2.default.createElement('div', { className: timeRangeClass, style: timeRangeStyle }),
 	            _react2.default.createElement(
@@ -20004,13 +20005,16 @@
 	            maxCursorDate: maxTime
 	        });
 	    },
-	    _getAvailableYearsHtml: function _getAvailableYearsHtml(min, max) {
+	    _getAvailableYearsHtml: function _getAvailableYearsHtml() {
+	        var min = this.state.minTime;
+	        var max = this.state.maxTime;
+	        var multiplier = this.state.multiplier;
 	        var html = [];
 
 	        if (typeof this.state.timeScale === 'undefined') return null;
 
 	        var style = {
-	            width: this.state.timeScale + 'px'
+	            width: this.state.timeScale * multiplier + 'px'
 	        };
 
 	        for (min; min <= max; min++) {
@@ -20019,15 +20023,19 @@
 	            if (min > this.state.minCursorDate && min < this.state.maxCursorDate) className += " time-block--in-range";
 	            if (min === this.state.minCursorDate || min === this.state.maxCursorDate) className += " time-block--active";
 
-	            html.push(_react2.default.createElement(
-	                'div',
-	                { className: 'time-block', style: style, key: 'year-' + min, onClick: this._transitionTo.bind(this, min) },
-	                _react2.default.createElement(
-	                    'span',
-	                    { className: className },
-	                    min
-	                )
-	            ));
+	            if (min % multiplier === 0) {
+	                html.push(_react2.default.createElement(
+	                    'div',
+	                    { className: 'time-block', style: style, key: 'year-' + min, onClick: this._transitionTo.bind(this, min) },
+	                    _react2.default.createElement(
+	                        'span',
+	                        { className: className },
+	                        min
+	                    )
+	                ));
+	            } else {
+	                html.push(null);
+	            }
 	        }
 
 	        return html;
@@ -20060,18 +20068,27 @@
 	    _setWindowVars: function _setWindowVars() {
 	        var _this6 = this;
 
-	        var time = this.state.maxTime - this.state.minTime;
+	        var time = this.state.maxTime - this.state.minTime + 1;
 	        var wrapperSize = this.timelineWrapper.offsetWidth;
 	        var wrapperOffsetLeft = this.timelineWrapper.offsetLeft;
 
+	        var multiplier = 1;
 	        var _state = this.state;
 	        var minCursorX = _state.minCursorX;
 	        var maxCursorX = _state.maxCursorX;
 
 	        var timeScale = wrapperSize / time;
 
-	        if (timeScale < this.props.cursorWidth) {
-	            timeScale = this.props.cursorWidth;
+	        //if (timeScale < this.props.cursorWidth) {
+	        //    timeScale = this.props.cursorWidth;
+	        //}
+
+	        if (timeScale * 1.5 < this.props.cursorWidth) {
+	            multiplier = 2;
+	        }
+
+	        if (timeScale * 2.5 < this.props.cursorWidth) {
+	            multiplier = 5;
 	        }
 
 	        if (this.state.timeScale) {
@@ -20091,7 +20108,8 @@
 	            wrapperOffsetLeft: wrapperOffsetLeft,
 	            timeScale: timeScale,
 	            minCursorX: minCursorX,
-	            maxCursorX: maxCursorX
+	            maxCursorX: maxCursorX,
+	            multiplier: multiplier
 	        }, function () {
 	            _this6._updateValue();
 	        });
