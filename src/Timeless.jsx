@@ -332,12 +332,12 @@ const Timeless = React.createClass({
         return (this.state[`${cursor}CursorX`] * newTimescale) / this.state.timeScale;
     },
 
-    _getDateX(year, timeScale, wrapperSize) {
+    _getDateX(year, timeScale) {
         const currentTimeScale = timeScale ? timeScale :  this.state.timeScale;
-        let dateX = (year - this.state.minTime) * currentTimeScale
+        let dateX = (year - this.state.minTime) * currentTimeScale;
 
         if (year === this.state.maxTime) {
-            dateX = dateX + this.props.cursorWidth / 2
+            dateX = dateX + (currentTimeScale - this.props.cursorWidth);
         }
 
         return dateX;
