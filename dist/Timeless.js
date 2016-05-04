@@ -72,6 +72,7 @@ var Timeless = _react2.default.createClass({
         var minCursorClass = 'time-cursor time-cursor--min';
         var maxCursorClass = 'time-cursor time-cursor--max';
         var timeRangeClass = 'timeline-range';
+        var timelineWrapperClass = 'timeline-wrapper';
 
         if (this.state.animate) {
             //minCursorStyle.transition = maxCursorStyle.transition = timeRangeStyle.transition = 'all 0.25s ease';
@@ -85,9 +86,11 @@ var Timeless = _react2.default.createClass({
             maxCursorClass += ' cursor-arrow';
         }
 
+        if (this.props.disabled) timelineWrapperClass += ' timeline--disabled';
+
         return _react2.default.createElement(
             'div',
-            { className: 'timeline-wrapper', ref: function ref(_ref3) {
+            { className: timelineWrapperClass, ref: function ref(_ref3) {
                     return _this.timelineWrapper = _ref3;
                 } },
             _react2.default.createElement(
@@ -125,6 +128,7 @@ var Timeless = _react2.default.createClass({
     _handleDrag: function _handleDrag(event) {
         var _this2 = this;
 
+        if (this.props.disabled) return false;
         var state = {};
 
         var index = this.state.activeCursor;

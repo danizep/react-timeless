@@ -6,12 +6,13 @@ import Timeless from '../src/Timeless';
 require('../scss/default.scss');
 
 ReactDOM.render(
-    <Timeless minTimestamp={601257600}
+    <Timeless minTimestamp={901257600}
               maxTimestamp={1217980800}
-              minCursorDefaultTimestamp={601257600}
-              maxCursorDefaultTimestamp={917980800}
+              minCursorDefaultTimestamp={901257600}
+              maxCursorDefaultTimestamp={1217980800}
               onChangeDelay={250}
               onChange={appendInfo}
+              customMinMessage="desde sempre"
         />,
     document.getElementById('example')
 );
