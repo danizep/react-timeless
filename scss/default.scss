@@ -23,6 +23,32 @@ $timeline_cursor_font_color: #fff !default;
   -moz-user-select: none;
   -webkit-user-select: none;
   -ms-user-select: none;
+
+  &.timeline--disabled {
+    cursor: not-allowed;
+
+    .timeline-range {
+      background-color: lighten($timeline_range_bg_color, 15);
+      cursor: not-allowed;
+    }
+
+    .time-cursor {
+      background-color: lighten($timeline_cursor_bg_color, 15);
+      cursor: not-allowed;
+    }
+
+    .cursor-arrow:after {
+      border-right-color: lighten($timeline_cursor_bg_color, 15);
+    }
+
+    .cursor-arrow:before {
+      border-left-color: lighten($timeline_cursor_bg_color, 15);
+    }
+
+    .time-block--year {
+      cursor: not-allowed;
+    }
+  }
 }
 
 .timeline-available {
