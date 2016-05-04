@@ -37,7 +37,9 @@ var Timeless = _react2.default.createClass({
             minTimestamp: 0,
             maxTimestamp: 0,
             minCursorDefaultTimestamp: 0,
-            maxCursorDefaultTimestamp: 0
+            maxCursorDefaultTimestamp: 0,
+            customMinMessage: null,
+            customMaxMessage: null
         };
     },
     componentWillMount: function componentWillMount() {
@@ -109,7 +111,7 @@ var Timeless = _react2.default.createClass({
                     onMouseDown: this._handleMouseDown.bind(this, 'min'),
                     onTouchStart: this._handleMouseDown.bind(this, 'min')
                 },
-                this.state.minCursorDate
+                this.state.minCursorLabel
             ),
             _react2.default.createElement(
                 'div',
@@ -121,7 +123,7 @@ var Timeless = _react2.default.createClass({
                     onMouseDown: this._handleMouseDown.bind(this, 'max'),
                     onTouchStart: this._handleMouseDown.bind(this, 'max')
                 },
-                this.state.maxCursorDate
+                this.state.maxCursorLabel
             )
         );
     },
@@ -273,7 +275,7 @@ var Timeless = _react2.default.createClass({
     _setWindowVars: function _setWindowVars() {
         var _this5 = this;
 
-        var time = this.state.maxTime - this.state.minTime;
+        var time = this.state.maxTime - this.state.minTime + 1;
         var wrapperSize = this.timelineWrapper.offsetWidth;
         var wrapperOffsetLeft = this.timelineWrapper.offsetLeft;
 
@@ -294,8 +296,8 @@ var Timeless = _react2.default.createClass({
             var minTime = new Date(this.props.minCursorDefaultTimestamp * 1000).getFullYear();
             var maxTime = new Date(this.props.maxCursorDefaultTimestamp * 1000).getFullYear();
 
-            minCursorX = this._getDateX(minTime, timeScale);
-            maxCursorX = this._getDateX(maxTime, timeScale);
+            minCursorX = this._getDateX(minTime, timeScale, wrapperSize);
+            maxCursorX = this._getDateX(maxTime, timeScale, wrapperSize);
         }
 
         this.setState({
@@ -309,20 +311,41 @@ var Timeless = _react2.default.createClass({
             _this5._updateValue();
         });
     },
-    _updateValue: function _updateValue() {
-        var _this6 = this;
+    _getCursorLabel: function _getCursorLabel() {
+        var _state2 = this.state;
+        var minTime = _state2.minTime;
+        var maxTime = _state2.maxTime;
+        var _props2 = this.props;
+        var customMinMessage = _props2.customMinMessage;
+        var customMaxMessage = _props2.customMaxMessage;
 
         var halfCursorWith = this.props.cursorWidth / 2;
         var minCursorDate = this.state.minTime + parseInt((this.state.minCursorX + halfCursorWith) / this.state.timeScale);
         var maxCursorDate = this.state.minTime + parseInt((this.state.maxCursorX + halfCursorWith) / this.state.timeScale);
+        var minCursorLabel = minCursorDate === minTime && customMinMessage !== null ? customMinMessage : minCursorDate;
+        var maxCursorLabel = maxCursorDate === maxTime && customMaxMessage !== null ? customMaxMessage : maxCursorDate;
 
-        if (minCursorDate === this.state.minCursorDate && maxCursorDate === this.state.maxCursorDate) return false;
+        return { minCursorDate: minCursorDate, maxCursorDate: maxCursorDate, minCursorLabel: minCursorLabel, maxCursorLabel: maxCursorLabel };
+    },
+    _updateValue: function _updateValue() {
+        var _this6 = this;
+
+        var _getCursorLabel2 = this._getCursorLabel();
+
+        var minCursorDate = _getCursorLabel2.minCursorDate;
+        var maxCursorDate = _getCursorLabel2.maxCursorDate;
+        var minCursorLabel = _getCursorLabel2.minCursorLabel;
+        var maxCursorLabel = _getCursorLabel2.maxCursorLabel;
+
+        if (minCursorDate === this.state.minCursorDate && maxCursorDate === this.state.maxCursorDate && minCursorLabel === this.state.minCursorLabel && maxCursorLabel === this.state.maxCursorLabel) return false;
 
         var minCursorTimestamp = this._getFirstDayTimestamp(minCursorDate);
         var maxCursorTimestamp = this._getLastDayTimestamp(maxCursorDate);
 
         this.setState({ minCursorDate: minCursorDate,
             maxCursorDate: maxCursorDate,
+            minCursorLabel: minCursorLabel,
+            maxCursorLabel: maxCursorLabel,
             minCursorTimestamp: minCursorTimestamp,
             maxCursorTimestamp: maxCursorTimestamp
         }, function () {
@@ -344,11 +367,12 @@ var Timeless = _react2.default.createClass({
         var maxCursorDiff = Math.abs(year - this.state.maxCursorDate);
         var activeCursor = minCursorDiff < maxCursorDiff ? 'min' : 'max';
         var clientX = event.clientX - this.state.wrapperOffsetLeft;
+        var activeCursorOffsetClient = year === this.state.maxTime ? -this.props.cursorWidth : this.props.cursorWidth / 2;
 
         this.setState({
-            animate: true,
             activeCursor: activeCursor,
-            activeCursorOffsetClient: this.props.cursorWidth / 2
+            activeCursorOffsetClient: activeCursorOffsetClient,
+            animate: true
         }, function () {
             _this7._handleDrag({ clientX: clientX });
         });
@@ -358,7 +382,13 @@ var Timeless = _react2.default.createClass({
     },
     _getDateX: function _getDateX(year, timeScale) {
         var currentTimeScale = timeScale ? timeScale : this.state.timeScale;
-        return (year - this.state.minTime) * currentTimeScale;
+        var dateX = (year - this.state.minTime) * currentTimeScale;
+
+        if (year === this.state.maxTime) {
+            dateX = dateX + (currentTimeScale - this.props.cursorWidth);
+        }
+
+        return dateX;
     }
 });
 
